@@ -17,37 +17,36 @@ class YouTubeDownloader:
         self.cropper = MrCropper()
 
     def print_separator(self, e=None):
-        if not e:
+        if e:
             print(e)
         print('--------------------------')
 
     def download(self, song_list: list):
         for nm, vID, s, e in song_list:
-            new_file = f'{self.RAW_PATH}/{nm}.mp4'
+            raw_file = f'{self.RAW_PATH}/{nm}.mp4'
 
             try:
                 yt = YouTube(f'https://www.youtube.com/watch?v={vID}')
                 audio = yt.streams.filter(only_audio=True).first()
                 out_file = audio.download(output_path=self.RAW_PATH)
-                os.rename(out_file, new_file)
+                os.rename(out_file, raw_file)
             except Exception as e:
                 self.print_separator(e)
                 continue
 
             try:
-                self.cropper.crop((new_file, s, e))
+                self.cropper.crop((raw_file, s, e))
             except Exception:
                 print(f'cropping failed for {nm}-{vID}')
 
+            self._cleanup(raw_file)
             self.print_separator()
 
-    def cleanup(self):
-        for fileNm in os.listdir(self.RAW_PATH):
-            file_path = os.path.join(self.RAW_PATH, fileNm)
-            try:
-                if os.path.isfile(file_path) or os.path.islink(file_path):
-                    os.unlink(file_path)
-                elif os.path.isdir(file_path):
-                    shutil.rmtree(file_path)
-            except Exception as e:
-                print('Failed to delete %s. Reason: %s' % (file_path, e))
+    def _cleanup(self, filename):
+        try:
+            if os.path.isfile(filename) or os.path.islink(filename):
+                os.unlink(filename)
+            elif os.path.isdir(filename):
+                shutil.rmtree(filename)
+        except Exception as e:
+            print('Failed to delete %s. Reason: %s' % (filename, e))
