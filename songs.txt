@@ -1,0 +1,98 @@
+{
+    "Aegean-sea": [
+        "Icaria", Wq9T2tBb7bQ edwvUO9GquM Gj_uyOxBhZI SMDLYFO8PuM BIT8XUCZJP8 hhihQ0DTyt4 1saHbL48Rss WiZeWwEwECY jWRbbHe1ryU
+        "Lesbos", Po3fuajrmD8 l9qQ4xgbhXM VVTaDoUSQno cbfdGSoHicU xjmTVtqxfuE kAT8p7DVo10 e4d83ykYC40 (2:25+) KUbS15ppAbA CWt0rrMhfIU
+        "Kasos", OnU0VBtUbCg zpszgAcbJ50 EnXWCj6CAPY BoVyNAiRDSM O6QND4pdcis j64Ja56ETlM 86atTWdLGAk O9Wx_rVhv1c XQOqN8c-YgY
+        "Chios",  RFsLV-gSP2E zkCCwXychHk eOG7gOxWJnY Qn5uK2VgHvg ty8AJgQhFJY s0jXKUcBwQw T-qzeQpe8ro
+        "Kalymnos", mhUd1QZx6u4 qSl7bfd882k Ov7pyzQ68YM h8sAhp4g5Kg tGLxyuH2W1k 57Ce5AYTnJU sbzJDdiyrNU nmcQSJBzRws
+        "Sifnos", nmcQSJBzRws Xl-oCg_UlVs 22SqUow-l3k x86-70Qtgzw hv8LCoJwJDc uJyJu6OHGgo ar0wKc3-vO8 v2KNT8U5o3Y a888fYY3JpY
+        "Folegandros", TVw7Aw8eevk -qpfhlqoT58 _2epxeZY93Q
+        "Amorgos", F2C8boBsp9s 5EMBJuhcsCA eD9IxqPUNCc SN4iI0bj_Lk xMGQ9k4Tyco ypdvFLoTFN4 h35BK5Sy2s0 BmxAQizXaCQ
+        "Naxos", ungPCMWI1i8 MC_rkPNHZYE aBNAhwaeyss X6gMN1z1I JC-d-UVCbQo 5fBWb8xtXMY wbQGMadMD1g
+        "Samos", Dvbi_8wJkeo Twj0wywEobU OAJboKQ9OmU k7d93v0bQJ0 RQYqliSGs_g k7d93v0bQJ0 n0AhyR65jN8 yl93wmWDkd0
+        "Rhodes", 3hcWPf4GOKg vfwhe80Q7MI 9ezl2UYSNQg eBkzxPFd3Oo rmKeLFR0GsY lxKkSk7D4r4 BmDeLtgjPSw o85zTYsBbVI kqW5WuMvtoU
+        "Mykonos", RGQK6J5mNzE bUsxO9w1Zvk bUsxO9w1Zvk 3pbGHf2MDVg MJur1E-ljPo MJur1E-ljPo Tx1-72lHSYw
+        "Paros", C5nE-1bGfbE Lv_mEWJdS-4 pimMJ4WfwXM iKwCOtlDhq4
+        "Andros", l_cziWxyCWw PyMvFNrKtW0 palZeyY1Lxs
+        "Kos", 9NSmwCoIjgY vIzQSZIU_f0 bL6DQWMIIIE dBolwOrkI5A 0FdZbh0-c4s
+        "Samothrace", NGFX-wzFPsU G940SGe3Hsc 6VlaH5MXq7Q ON2WBb4aPLk QKNYxrAyOIg gUkF406fSxU 2dYrvzj_n3I
+        "Leros", 4akA0ZM17pw oEi-xbr3_ak hgWd4kiqVRA M11VYv5Kavk Tuzvmi9LCnw VXbeudwvX1g M_MqUKx_lpo 0HwKYHP-kTg
+        "Skyros", Mg1k5yrxPK8 zNCbDJ8Ulp4 BVPiZO94Fm4 PsrilSC7Ck4
+        "Aegina", CtLH5QaQ-A8 jakS56lMriU
+        "Kea", HuuqEHI10pI
+        "Halki",
+        "Kythnos", IFBrv5PQCIY _TL_53Q6yi0 adXF-TE1pfw YC6UdmjOpew OMEAZeQTkd4 lmeVOoBHePQ FzMznTiVElQ Dy1codGk_9A doPSfVuDT7E
+        "Karpathos", cAfnxbafxSk 0-GDn4Qm-GA gIOC90AHMd8 Q1Ouv0poAEs ab2suCCG6b0 Bt9f18Hpgrs
+        "Lemnos", k8UneMzW_ZM tBOl1q3RdSg hSqhpJvWH0w 6q6W90N50jk tMbVWdmHmLA U1b9xQyjEYI 8jMz58m-0mA
+        "Serifos", RlOUblPUkco I10iHz_7v0o MeUxg0YlpRo XKRxnh_Oxcw XKRxnh_Oxcw E6iEDPWYxi4
+        "Oinousses", 
+        "Nisyros" wqKZAL5AyIc raQRZwR-8cQ 9nSLmzTx-rA 6p0w00qWaZY WZj3lps-Gk8 Yi_eDuIE07U VS1I6nkT6Is Pn1kCheWeYo y1L30zVmO70
+        aNUBuDPAk_I oi9Wqfz3EIk 5YEKsc149WM _ZQcOgvq4XM 54X7YK1tA4s UaXEmWry_GA 4KKzxTF9BhA THTu09jOgmk 4ELZq7ljT1A
+    ],
+    "Asia-minor": [
+        "Smyrni", UrmP2bfLkoY (2+) YL1tqYOOBzQ HxkVa9Kt6Jw TYrhSSC2Ex8 Ir2tKjUlmrc RFpmOeqoSGI ynyj8WtGgqo 8oyn_EdCQFI 9p61FZsyt4I
+        "Aivali",
+        "Poli", oyuJ75ssqhs tudFVNSXssU dPPw8p2pUs8 4VhGY7Mzo-0 ObuTythXNcE pR3qVTgpzcY 297AQb1sCic
+        "Cappadocia" DYYvIhhiX3s ORFu8SLZetk Y10lyb9ROdw 0kAP2kRtoEI SSPbRo3jBSU WdIETk4T0IU (5s+) auvVrMaE6FA (5s+)
+        TXcAfh6UnD8 O7oP8tYKXKk 8Eo3AW6Howw _EByAMaupi0 wwWJrwTKRIg K06jLvaS_s FVihBoFajOo sVUrd47qxD0 pLjdCCKb-hY AYo4Ccftfgo
+    ],
+    "Bulgaria": [], REMOVE
+    "Central-Greece": [
+        "Mesologgi", UADltlpgIEk jxOPtmPFIZs QQCzk45dI9A
+        "Arachova" OEWpBmkYShY _ExDR2ipcnc -uarLR02BCE
+        4ev2up3J580 nGwDz-8YAuQ zgOlnVmS1bc KtWLiL7WQbE FUmo2PxD2yU q6yeo1IV5Qw ZK3kABWYOM8 saxWI12cD08 wU37ojuUBfU -APv08ZlSso
+    ],
+    "Crete": [
+        "West-Crete", OIqVQMxdutI j1sAzpuGyq0 G5DQWqmbW5c ZAU-8VnwRYs UHqYv5KQf9Y I7xkcZytUec (1:00+) vVT4mCYlg7s 7Ei8A_IVPD4 50uO-nrWO_I pTL3Q6Vo yB5zQydR5UI 4xAHo3RuCM0 UVmMK1Z-kIE
+        "East-Crete" Bvd-oMDGN5s fIhdQprkMLQ GV5abX28FeQ nGo_zU4M2E rBAtWOD4VYE Bmx7QYXZ_10 JOwLHeesmfk i07obXBHe3s IZcZYgpDCU co1_Z02eiDk 
+    ],
+    "Cyprus": [], whs7lCVtAb4 IaTZHDX2Vuc f0tJPY8UJxU fhgBxpQjoFc KHa8pnIJJQI NaLcdBfunzg kAUfxL2QRuM
+    "Egypt": [], e-JuPIEadPI
+    "Epirus": [
+        "Deropolis",  ycMNsIU_xeI 24-X2xUgsJo RdPuvo8y68M XYF8hWTbuZE ewDmWzsqZTw blfyVbTFKbQ CjQWio5E-wE 0jSUANx4pJU
+        "Metsovo", Jivhl9jtro0 m-rxtlPwDaI 5ywB2kUQgP0 AAy9Ww1LatA L-NL3isYRBI 5NFSdprZreI VRC-6BjqoK8 Jkt5CeBQwNM
+        "Arta", Jkt5CeBQwNM jWdSILaYhsA Lzbh5lSXCoA 3cbGHSXQVdY soBgn-NCrsA -ou2fZJelHc XzV5UBcsnpU WhiejHzCbQ0
+        "Zagori", ynnwYZLQeoM asl8UhHPeKQ -YOteshg_Y8 kG3gWVTy5Es p6qy3NWrK40 A0l6w23xvRQ B2DyY6TPm84 SQQgaZEfQJU
+        "Pogoni", N8HzQhRpe4U oWRoD8XR6A8 smCEMa0vEtY wLlm33vLM-U ihRVj9amn3g FUGszbj2d7M 2R8icqGW7OE akwGOrBgdV8
+        "Syrrako", K-lMTjofrjQ vR8B6SEy2fA HHZC1MOz7uc
+        "Himara",
+        "Konitsa", ksIrAdySIIQ _HYCk1JCYVU hPvTiHRsVDg tU-Q9BdMJGY g101uR0h5L0 -sxdj3piLyQ FAX5yan6kvo _LQyHfbcHKI BDeunuyMNx4
+        "Preveza", 20IB14AnIAo 5NfrZKk2S5k 8SBrtGp0KBE WFHu3n50OWs 7qITrE1SmyQ 6whBJ8qQCk8 MKsRqAnJkQ8
+        "Tzoumerka" bgqQg0tRwDU BCD8MhBWxZM
+
+        HHZC1MOz7uc _tpiySqNWC4 562OwXu_yug nxeeRj3hmiQ m5USetxaSN0 DpeuAlSiRs0
+    ],
+    "Euboea": [], rYNuSFxG1no 25ivqt0QDqg bPBRN1L89Vc xXUQjgwJ89U WCII7hvbkWk LTKRwR_Yj3k 5T5cPE9mpNY o-jeU1KhpEI
+    "Ionian-sea": [
+        "Corfu", l-j56KQcpRY 4YmONaw7NNA 4SKqDoIvjz 0M-IIaVtIok JHxGc_4DPEQ 1m_4S2i-Kmw Z38nR7Nq_aM nuKWoH-MiRk
+        "Zakynthos", w2jfsBwB5YA ouNc-1HAW-M ODO46kxoups HuqgvOuxUA UnqccC_cxhY 7-fE14tydUQ O2SrBIENJJA
+        "Cephalonia", cRPGONe0Ffo 2xm4U4vx-DI TUBBuxTb13Y -QLidgacssI j1D5o9b IZPCayWMkHM LnNaotGiaIU
+        "Lefkada" SwLq_fIlw0w A3ztuHHoCWo A3ztuHHoCWo mnWLB_ASM6U xu9TlrTEQa8 3xd6glYhhAY
+    ], 
+    "Kythira": [], s5HpHvUBKIw kWLPPAWJsLE x5wKDJzOjhs S8Ws9bW9tJk jVrf-XS1Iqo
+    "Lebanon": [], REMOVE
+    "Macedonia": [
+        "Serres", klptDc6YseY kbrjpUJOi4w MwuBRVmJKIE Jd43hyYnG2A iRxiSgpNi0k EdLxqyuzeEs DHwDihqrl9c PQtsIqj5Ihg
+        "Grevena", hq1Nz7tG9zA 7iw6G2fegQA ptPTaIsV2mk fibxq5jIrIc 3QnaolG_65o SwiTbfy4q4k luR9PSdBK3o a818XpHkQoQ
+        "Halkidiki", R_meSbYsOno 2_kgJF2SUOo TSQvr1zQnIY C-bvViGLZxY 52UFiux48D8 -6WR0Ms13qA YW6SnVcLDCc IpkUNoegCDc
+        "Drama", siiG_tzkblQ HF9vSFLihLc (20s+) hmd6w-EPoJg Jm32kQjDuEg ZJLbnOxAyOY OW0J28Z2UN8 L6UmuKj99_E 3mDb0Y3z7ds
+        "Kilkis", EllEeHYHZkc 581s5h_AyVI
+        "Kastoria", MpiYIl6wktY _gEQSzddhtc sp1mnkEjU7A HgG2Ej7HD2s 1YwvnVCe4bM GebGktCuNzA gLKe9vBQXRY H2SbrSEmug4
+        "Thessaloniki" rEHvAbWYtIc UjbcTN2eDUc
+    ],
+    "None": [],
+    "Peloponnese": [
+        "Kalavryta", dlN3vQYh3Lc L68tJlodJAo 3dSA_JpnP40 7VNfO0dN4gU gFkdSXKzltk
+        "Arcadia" kItIYJRn03w hy0lJzTqBHc 5t-1dq-pER8 BdQudGwa7EQ y6VoKDxxl3A vKxmEFkZwOo KI_dW24Q58A 9Kh24mXqJPk sDPrCMu
+    ],
+    "Pontus": [], 6IONkrtW_WU 9835AnLaEiM IhtBTr0Ip1k xR0CfEYWHfE w_JT_jW1P30 tPceDEbdq0wβ 5Q-1M2x08Ow AJ4Oyhg3KxA SXzqPY9gI3s PNO8gJPbOtc 9mqx7EqB-PM
+    "Romania": [],  REMOVE
+    "Southern-Italy": [
+        "Napoli"    REMOVE
+    ],
+    "Thessaly": [
+        "Trikala" tu-2X8DSFUk _uuO7d3AXC 0KlzurPGkvc WuDD7pn7wZo JqOUwGhV1SU d1X4DgR2zok
+    ],
+    "Thrace": [], etU9eqQJweg YlNYVv3jTOU w-E4vmlTMeo hGIbKVxAh34 6lBGH9oebI4 i4X8wScj5Ng JO0oq-EDBTE NhGAK5WW654 b7vLsV3tjUI
+    "Turkey": [] REMOVE
+}
