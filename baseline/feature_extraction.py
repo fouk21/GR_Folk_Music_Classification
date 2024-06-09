@@ -57,7 +57,7 @@ if __name__ == '__main__':
             x=val[:, 0],
             y=val[:, 1],
             mode='markers',
-            name='blues',
+            name=region,
             marker=dict(
                 size=10,
                 color='rgba(255, 182, 193, .9)',)
