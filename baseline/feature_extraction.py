@@ -6,6 +6,12 @@ import plotly
 import plotly.graph_objs as go
 
 from pyAudioAnalysis.MidTermFeatures import directory_feature_extraction as dW
+from sklearn.metrics import (
+    accuracy_score, auc,
+    confusion_matrix, f1_score,
+    matthews_corrcoef, precision_score,
+    recall_score, roc_curve
+)
 from sklearn.svm import SVC
 
 # Define PY script folder
@@ -94,3 +100,10 @@ if __name__ == '__main__':
 
     plotly.offline.plot(go.Figure(data=plots, layout=layout),
                         filename='temp2.html', auto_open=True)
+
+    # METRICS
+    accuracy = accuracy_score(yy, Z)
+    precision = precision_score(yy, Z, average='macro')
+    recall = recall_score(yy, Z, average='macro')
+    f1 = f1_score(yy, Z, average='macro')
+    matthews = matthews_corrcoef(yy, Z)
