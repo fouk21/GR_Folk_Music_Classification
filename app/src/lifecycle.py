@@ -19,7 +19,7 @@ async def lifespan(app: FastAPI):
     config_file_path = f'{CURRENT_DIR}/../config.toml'
     config = toml.load(config_file_path)
 
-    upload_dir = f'{CURRENT_DIR}/{config["settings"]["uploads_dir"]}'
+    upload_dir = f'{CURRENT_DIR}/../{config["settings"]["uploads_dir"]}'
     os.makedirs(upload_dir, exist_ok=True)
     os.environ['UPLOADS_DIR'] = str(upload_dir)
 

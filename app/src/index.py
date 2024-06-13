@@ -7,6 +7,7 @@ from fastapi import FastAPI
 from lifecycle import lifespan
 from routers.dataset import list
 from routers.health import health, ping
+from routers.uploads import create
 
 
 # Define PY script folder
@@ -62,6 +63,7 @@ app = FastAPI(
     openapi_tags=tags_metadata,
     lifespan=lifespan,
 )
+app.include_router(create.router)
 app.include_router(ping.router)
 app.include_router(health.router)
 app.include_router(list.router)
