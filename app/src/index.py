@@ -47,9 +47,8 @@ config = toml.load(config_file_path)
 # Extract tags metadata from the configuration
 tags_metadata = config.get("tags", [])
 
-# Extract UPLOADS dir and create it
-upload_dir = f'{CURRENT_DIR}/{config["settings"]["uploads_dir"]}'
-os.makedirs(upload_dir, exist_ok=True)
+os.environ['INDEX_PATH'] = str(CURRENT_DIR)
+
 
 # ------------------------ #
 #      FastApi routes      #
