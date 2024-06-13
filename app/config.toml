@@ -7,3 +7,6 @@ description = "Endpoints for testing server health."
 [[tags]]
 name = "dataset"
 description = "Operations related to the training/validation/test datasets."
+
+[settings]
+uploads_dir = "uploads/"
