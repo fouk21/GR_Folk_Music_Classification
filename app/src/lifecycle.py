@@ -21,7 +21,7 @@ async def lifespan(app: FastAPI):
 
     upload_dir = f'{CURRENT_DIR}/{config["settings"]["uploads_dir"]}'
     os.makedirs(upload_dir, exist_ok=True)
-    os.environ['INDEX_PATH'] = str(upload_dir)
+    os.environ['UPLOADS_DIR'] = str(upload_dir)
 
     api_logger.info('Application startup: Set the UPLOADS directory')
 
