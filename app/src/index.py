@@ -4,6 +4,7 @@ import toml
 
 from datetime import datetime
 from fastapi import FastAPI
+from lifecycle import lifespan
 from routers.dataset import list
 from routers.health import health, ping
 
@@ -26,7 +27,9 @@ formatter = logging.Formatter(
 )
 
 # File handler
-file_handler = logging.FileHandler(f'{CURRENT_DIR}/logs/{TODAY}.log', 'a+', 'utf-8')
+file_handler = logging.FileHandler(
+    f'{CURRENT_DIR}/logs/{TODAY}.log', 'a+', 'utf-8'
+)
 file_handler.setFormatter(formatter)
 api_logger.addHandler(file_handler)
 
@@ -54,6 +57,7 @@ app = FastAPI(
     ''',
     version="0.1.0",
     openapi_tags=tags_metadata,
+    lifespan=lifespan,
 )
 app.include_router(ping.router)
 app.include_router(health.router)
