@@ -1,0 +1,9 @@
+# config.toml
+
+[[tags]]
+name = "health"
+description = "Endpoints for testing server health."
+
+[[tags]]
+name = "dataset"
+description = "Operations related to the training/validation/test datasets."
