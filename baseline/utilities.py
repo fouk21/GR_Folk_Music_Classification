@@ -1,4 +1,4 @@
-"""! 
+"""!
 @brief Utilities
 @details General purpose routines
 @author Theodoros Giannakopoulos {tyiannak@gmail.com}
@@ -13,6 +13,7 @@ from sklearn.svm import SVR
 from sklearn.model_selection import KFold
 from sklearn.metrics import confusion_matrix, f1_score, accuracy_score
 from sklearn.metrics import mean_squared_error, mean_absolute_error
+
 
 def plot_feature_histograms(list_of_feature_mtr, feature_names,
                             class_names, n_columns=5):
@@ -76,11 +77,13 @@ def compute_class_rec_pre_f1(c_mat):
         f1.append(2 * rec[-1] * pre[-1] / (rec[-1] + pre[-1]))
     return rec,  pre, f1
 
-def find_nearest(x,A):
+
+def find_nearest(x, A):
     '''
     returns the closest element in an array
     '''
     return A[(np.abs(A-x)).argmin()]
+
 
 def svm_train_evaluate(X, y, k_folds, C=1, use_regressor=False):
     '''
@@ -91,8 +94,8 @@ def svm_train_evaluate(X, y, k_folds, C=1, use_regressor=False):
     :param use_regressor: use svm regression for training (not nominal classes)
     :return: confusion matrix, average f1 measure and overall accuracy
     '''
-    #classes 
-    Y_classes=list(set(y))
+    # classes
+    Y_classes = list(set(y))
     # normalize
     mean, std = X.mean(axis=0), np.std(X, axis=0)
     X = (X - mean) / (std)
@@ -108,8 +111,8 @@ def svm_train_evaluate(X, y, k_folds, C=1, use_regressor=False):
         cl.fit(x_train, y_train)
         y_pred = cl.predict(x_test)
         if use_regressor:
-            for i,_ in enumerate(y_pred):
-                y_pred[i]=find_nearest(y_pred[i],Y_classes)
+            for i, _ in enumerate(y_pred):
+                y_pred[i] = find_nearest(y_pred[i], Y_classes)
         # update aggregated confusion matrix:
         if count_cm == 0:
             cm = confusion_matrix(y_pred=y_pred, y_true=y_test)
@@ -138,12 +141,17 @@ def plotly_classification_results(cm, class_names):
     b1 = go.Bar(x=class_names,  y=rec, name="rec", marker=mark_prop1)
     b2 = go.Bar(x=class_names,  y=pre, name="pre", marker=mark_prop2)
     b3 = go.Bar(x=class_names,  y=f1, name="f1", marker=mark_prop3)
-    figs = plotly.subplots.make_subplots(rows=1, cols=2,
-                                      subplot_titles=["Confusion matrix",
-                                                      "Performance measures"])
-    figs.append_trace(heatmap, 1, 1); figs.append_trace(b1, 1, 2)
-    figs.append_trace(b2, 1, 2); figs.append_trace(b3, 1, 2)
+    figs = plotly.subplots.make_subplots(
+        rows=1,
+        cols=2,
+        subplot_titles=["Confusion matrix", "Performance measures"]
+    )
+    figs.append_trace(heatmap, 1, 1)
+    figs.append_trace(b1, 1, 2)
+    figs.append_trace(b2, 1, 2)
+    figs.append_trace(b3, 1, 2)
     plotly.offline.plot(figs, filename="temp.html", auto_open=True)
+
 
 def svm_train_evaluate_regression(X, y, k_folds, C=1):
     '''
