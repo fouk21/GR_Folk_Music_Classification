@@ -45,4 +45,4 @@ if __name__ == '__main__':
         file_list = file_list_abs_path(region_path)
         spec_extractor = Spectrogram(file_list)
 
-        spec_extractor.extract_spectrograms()
+        spec_extractor.extract_spectrograms(region)

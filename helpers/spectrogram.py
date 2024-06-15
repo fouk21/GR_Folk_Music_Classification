@@ -23,7 +23,10 @@ class Spectrogram():
         return (signal - signal.mean()) /\
             ((np.abs(signal)).max() + 0.0000000001)
 
-    def extract_spectrograms(self):
+    def extract_spectrograms(self, region):
+        base_path = {self.output_path}/{region}
+        os.makedirs(base_path, exist_ok=True)
+
         for audio_file in self.audio_files:
             if not self._is_file(audio_file):
                 continue
@@ -79,7 +82,7 @@ class Spectrogram():
             plt.gca().xaxis.set_major_locator(plt.NullLocator())
             plt.gca().yaxis.set_major_locator(plt.NullLocator())
             plt.savefig(
-                f'{self.output_path}/{base_name_wo_ext}.png',
+                f'{base_path}/{base_name_wo_ext}.png',
                 bbox_inches='tight',
                 pad_inches=0,
             )
