@@ -8,7 +8,7 @@ CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 
 class MrCropper:
-    CROPPED_PATH = f'{CURRENT_DIR}/cropped2'
+    CROPPED_PATH = f'{CURRENT_DIR}/cropped'
 
     def __init__(self) -> None:
         pass
