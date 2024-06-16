@@ -2,6 +2,7 @@
 import numpy as np
 import os
 import pandas as pd
+import pickle
 # import plotly
 # import plotly.graph_objs as go
 
@@ -21,12 +22,12 @@ if __name__ == '__main__':
     df = pd.read_csv(dataset)
 
     regions = np.sort(df['region'].dropna().unique())
-    regions = regions[-3:]
+    # regions = regions[-1:]
     print(regions)
 
     features = []
-    fMeanStd = []
-    plots = []
+    # fMeanStd = []
+    # plots = []
     fn = None
 
     # get features from folders (all classes)
@@ -40,6 +41,10 @@ if __name__ == '__main__':
 
         # foo = np.array([f[:, feat.index(name_1)], f[:, feat.index(name_2)]]).T
         # fMeanStd.append(foo)
+
+    # Save the array
+    with open('features.pkl', 'wb') as f:
+        pickle.dump(features, f)
 
     # Flatten the nested structure
     data = [list(sample) + [regions[class_idx]] for class_idx, samples in enumerate(features) for sample in samples]
