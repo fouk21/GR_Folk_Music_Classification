@@ -1,3 +1,4 @@
+import gc
 import librosa
 import librosa.display
 import matplotlib.pyplot as plt
@@ -24,17 +25,26 @@ class Spectrogram():
             ((np.abs(signal)).max() + 0.0000000001)
 
     def extract_spectrograms(self, region):
-        base_path = {self.output_path}/{region}
+        i = 1
+        total = len(self.audio_files)
+        base_path = f'{self.output_path}/{region}'
         os.makedirs(base_path, exist_ok=True)
 
         for audio_file in self.audio_files:
             if not self._is_file(audio_file):
                 continue
 
-            print(f'Creating spectrogram for {audio_file}')
+            print(f'Creating spectrogram for {region}: {i:02} out of {total}')
+            i += 1
 
             base_name = os.path.basename(audio_file)
             base_name_wo_ext = os.path.splitext(base_name)[0]
+
+            spec_name = f'{base_path}/{base_name_wo_ext}.png'
+
+            if self._is_file(spec_name):
+                print(f'Creating spectrogram for {region}: {i:02} out of {total}')
+                continue
 
             # Load the audio file
             y, sr = librosa.load(audio_file, sr=None)
@@ -82,8 +92,15 @@ class Spectrogram():
             plt.gca().xaxis.set_major_locator(plt.NullLocator())
             plt.gca().yaxis.set_major_locator(plt.NullLocator())
             plt.savefig(
-                f'{base_path}/{base_name_wo_ext}.png',
+                spec_name,
                 bbox_inches='tight',
                 pad_inches=0,
             )
-            plt.close()
+            plt.close('all')
+
+            del y
+            del sr
+            del D
+            del S_db
+
+            gc.collect()

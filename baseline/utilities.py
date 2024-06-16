@@ -12,7 +12,7 @@ from sklearn.svm import SVC
 from sklearn.svm import SVR
 from sklearn.model_selection import KFold
 from sklearn.metrics import confusion_matrix, f1_score, accuracy_score
-from sklearn.metrics import mean_squared_error, mean_absolute_error
+from sklearn.metrics import mean_absolute_error
 
 
 def plot_feature_histograms(list_of_feature_mtr, feature_names,
@@ -28,8 +28,11 @@ def plot_feature_histograms(list_of_feature_mtr, feature_names,
     n_features = len(feature_names)
     n_bins = 12
     n_rows = int(n_features / n_columns) + 1
-    figs = plotly.subplots.make_subplots(rows=n_rows, cols=n_columns,
-                                         subplot_titles=feature_names)
+    figs = plotly.subplots.make_subplots(
+        rows=n_rows,
+        cols=n_columns,
+        subplot_titles=feature_names
+    )
     figs['layout'].update(height=(n_rows * 250))
     clr = get_color_combinations(len(class_names))
     for i in range(n_features):
@@ -43,8 +46,13 @@ def plot_feature_histograms(list_of_feature_mtr, feature_names,
             h, _ = np.histogram(f[:, i], bins=bins)
             h = h.astype(float) / h.sum()
             cbins = (bins[0:-1] + bins[1:]) / 2
-            scatter_1 = go.Scatter(x=cbins, y=h, name=class_names[fi],
-                                   marker=mark_prop, showlegend=(i == 0))
+            scatter_1 = go.Scatter(
+                x=cbins,
+                y=h,
+                name=class_names[fi],
+                marker=mark_prop,
+                showlegend=(i == 0)
+            )
             # (show the legend only on the first line)
             figs.append_trace(scatter_1, int(i/n_columns)+1, i % n_columns+1)
     for i in figs['layout']['annotations']:
@@ -57,10 +65,12 @@ def get_color_combinations(n_classes):
     range_cl = range(int(int(255/n_classes)/2), 255, int(255/n_classes))
     clr = []
     for i in range(n_classes):
-        clr.append('rgba({},{},{},{})'.format(clr_map(range_cl[i])[0],
-                                              clr_map(range_cl[i])[1],
-                                              clr_map(range_cl[i])[2],
-                                              clr_map(range_cl[i])[3]))
+        clr.append('rgba({},{},{},{})'.format(
+            clr_map(range_cl[i])[0],
+            clr_map(range_cl[i])[1],
+            clr_map(range_cl[i])[2],
+            clr_map(range_cl[i])[3])
+        )
     return clr
 
 
@@ -127,20 +137,30 @@ def svm_train_evaluate(X, y, k_folds, C=1, use_regressor=False):
 
 
 def plotly_classification_results(cm, class_names):
-    heatmap = go.Heatmap(z=np.flip(cm, axis=0), x=class_names,
-                         y=list(reversed(class_names)),
-                         colorscale=[[0, '#4422ff'], [1, '#ff4422']],
-                         name="confusin matrix", showscale=False)
+    heatmap = go.Heatmap(
+        z=np.flip(cm, axis=0),
+        x=class_names,
+        y=list(reversed(class_names)),
+        colorscale=[[0, '#4422ff'], [1, '#ff4422']],
+        name="confusin matrix",
+        showscale=False,
+    )
     rec, pre, f1 = compute_class_rec_pre_f1(cm)
-    mark_prop1 = dict(color='rgba(150, 180, 80, 0.5)',
-                      line=dict(color='rgba(150, 180, 80, 1)', width=2))
-    mark_prop2 = dict(color='rgba(140, 200, 120, 0.5)',
-                      line=dict(color='rgba(140, 200, 120, 1)', width=2))
-    mark_prop3 = dict(color='rgba(50, 150, 220, 0.5)',
-                      line=dict(color='rgba(50, 150, 220, 1)', width=3))
-    b1 = go.Bar(x=class_names,  y=rec, name="rec", marker=mark_prop1)
-    b2 = go.Bar(x=class_names,  y=pre, name="pre", marker=mark_prop2)
-    b3 = go.Bar(x=class_names,  y=f1, name="f1", marker=mark_prop3)
+    mark_prop1 = dict(
+        color='rgba(150, 180, 80, 0.5)',
+        line=dict(color='rgba(150, 180, 80, 1)', width=2),
+    )
+    mark_prop2 = dict(
+        color='rgba(140, 200, 120, 0.5)',
+        line=dict(color='rgba(140, 200, 120, 1)', width=2),
+    )
+    mark_prop3 = dict(
+        color='rgba(50, 150, 220, 0.5)',
+        line=dict(color='rgba(50, 150, 220, 1)', width=3),
+    )
+    b1 = go.Bar(x=class_names, y=rec, name="rec", marker=mark_prop1)
+    b2 = go.Bar(x=class_names, y=pre, name="pre", marker=mark_prop2)
+    b3 = go.Bar(x=class_names, y=f1, name="f1", marker=mark_prop3)
     figs = plotly.subplots.make_subplots(
         rows=1,
         cols=2,
