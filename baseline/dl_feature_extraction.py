@@ -107,7 +107,7 @@ def main():
     df = pd.read_csv(dataset)
 
     regions = np.sort(df['region'].dropna().unique())
-    regions = regions[-5:]
+    # regions = regions[-5:]
     print(regions)
 
     features = []
@@ -136,7 +136,7 @@ def main():
             )
 
     # Save the array just in case
-    with open('features.pkl', 'wb') as f:
+    with open('dl_features.pkl', 'wb') as f:
         pickle.dump(features, f)
 
     # Create the features dataframe
