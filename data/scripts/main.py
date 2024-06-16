@@ -13,6 +13,7 @@ CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 def download_dataset(file):
     df = None
+    cols = ['id', 'youtube-id', 'start-ts', 'end-ts']
 
     if file == 'lyra':
         # Lyra dataset
@@ -20,14 +21,20 @@ def download_dataset(file):
         df = pd.read_csv(url, sep='\t')
     elif file == 'enhanced':
         # Enhanced dataset
-        path = f'{CURRENT_DIR}/../../data_exploration/new_data_v2.csv'
-        df = pd.read_csv(path, sep=';')
-        df['id'] = df['id'].apply(lambda _: f'{uuid.uuid4()}')
+        exp_path = f'{CURRENT_DIR}/{file}.csv'
+
+        if not os.path.exists(exp_path):
+            path = f'{CURRENT_DIR}/../../data_exploration/new_data_v2.csv'
+            df = pd.read_csv(path, sep=';')
+            df['id'] = df['id'].apply(lambda _: f'{uuid.uuid4()}')
+            to_save_df = df[['id', 'youtube-id', 'region', 'start-ts', 'end-ts']]
+            to_save_df.to_csv(exp_path, index=False)
+        else:
+            df = pd.read_csv(exp_path, sep=',')
     else:
         df = pd.read_csv(file, sep=',')
 
-    subset_df = df[['id', 'youtube-id', 'start-ts', 'end-ts']]
-    subset_df.to_csv(f'{CURRENT_DIR}/{file}.csv', index=False)
+    subset_df = df[cols]
     song_list = subset_df.to_numpy()
 
     yt = YouTubeDownloader()
@@ -52,7 +59,6 @@ def main():
     # Print the file path
     print(f"Received file: {file}")
 
-    # Check if the file exists
     try:
         download_dataset(file)
     except FileNotFoundError:
