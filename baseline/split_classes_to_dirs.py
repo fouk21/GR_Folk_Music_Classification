@@ -10,7 +10,7 @@ CLASS_FOLDER = 'data/musical_regions'
 def main():
     absolute_path_class_dir = f'{CURRENT_DIR}/../{CLASS_FOLDER}'
     processed_dir = f'{CURRENT_DIR}/../data/scripts/cropped'
-    df = pd.read_csv(f'{CURRENT_DIR}/../data_exploration/preprocessed_dataset.csv')
+    df = pd.read_csv(f'{CURRENT_DIR}/../data/scripts/gr_folk_music.csv')
     regions = df['region'].unique()
 
     for region in regions:

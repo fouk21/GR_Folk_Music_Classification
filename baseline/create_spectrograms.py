@@ -26,7 +26,7 @@ def file_list_abs_path(folder_path):
 
 
 if __name__ == '__main__':
-    dataset = f'{CURRENT_DIR}/../data_exploration/preprocessed_dataset.csv'
+    dataset = f'{CURRENT_DIR}/../data/scripts/gr_folk_music.csv'
     df = pd.read_csv(dataset)
 
     regions = np.sort(df['region'].dropna().unique())

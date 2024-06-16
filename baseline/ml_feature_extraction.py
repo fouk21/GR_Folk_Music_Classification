@@ -18,11 +18,11 @@ CLASS_FOLDER = f'{CURRENT_DIR}/../data/musical_regions'
 #     xaxis=dict(title=name_1,), yaxis=dict(title=name_2,))
 
 if __name__ == '__main__':
-    dataset = f'{CURRENT_DIR}/../data_exploration/preprocessed_dataset.csv'
+    dataset = f'{CURRENT_DIR}/../data/scripts/gr_folk_music.csv'
     df = pd.read_csv(dataset)
 
     regions = np.sort(df['region'].dropna().unique())
-    # regions = regions[-1:]
+    regions = regions[-1:]
     print(regions)
 
     features = []

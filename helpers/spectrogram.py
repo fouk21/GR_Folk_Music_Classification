@@ -34,7 +34,7 @@ class Spectrogram():
             if not self._is_file(audio_file):
                 continue
 
-            print(f'Creating spectrogram for {region}: {i:02} out of {total}')
+            print(f'Creating spectrogram for {region}: {i:03} out of {total}')
             i += 1
 
             base_name = os.path.basename(audio_file)
@@ -43,7 +43,6 @@ class Spectrogram():
             spec_name = f'{base_path}/{base_name_wo_ext}.png'
 
             if self._is_file(spec_name):
-                print(f'Creating spectrogram for {region}: {i:02} out of {total}')
                 continue
 
             # Load the audio file
