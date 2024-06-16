@@ -12,6 +12,15 @@ from pyAudioAnalysis.MidTermFeatures import directory_feature_extraction as dW
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 CLASS_FOLDER = f'{CURRENT_DIR}/../data/musical_regions'
 
+
+def identifySingleList(samples):
+    try:
+        len(samples[0])
+        return samples
+    except:
+        return [samples]
+
+
 # name_1, name_2 = 'spectral_entropy_std', 'chroma_std_std'
 # layout = go.Layout(
 #     title='GR Folk Music Classification',
@@ -22,7 +31,7 @@ if __name__ == '__main__':
     df = pd.read_csv(dataset)
 
     regions = np.sort(df['region'].dropna().unique())
-    regions = regions[-1:]
+    # regions = regions[-5:]
     print(regions)
 
     features = []
@@ -43,19 +52,19 @@ if __name__ == '__main__':
         # fMeanStd.append(foo)
 
     # Save the array
-    with open('features.pkl', 'wb') as f:
+    with open('ml_features.pkl', 'wb') as f:
         pickle.dump(features, f)
 
     # Flatten the nested structure
-    data = [list(sample) + [regions[class_idx]] for class_idx, samples in enumerate(features) for sample in samples]
+    data = [[regions[class_idx]] + list(sample) for class_idx, samples in enumerate(features) for sample in identifySingleList(samples)]
 
     # Create column names
     num_features = len(features[0][0])
-    column_names = fn + ['label']
+    column_names = ['label'] + fn
 
     # Create the features dataframe
     df = pd.DataFrame(data, columns=column_names)
-    df.to_csv(f'{CURRENT_DIR}/train.csv')
+    df.to_csv(f'{CURRENT_DIR}/ml_features.csv', index=False)
 
     # plot histograms for each feature and normalize
     # ut.plot_feature_histograms(
