@@ -11,7 +11,7 @@ CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 class YouTubeDownloader:
     BASE_YT_URL = 'https://www.youtube.com/watch?v='
-    RAW_PATH = f'{CURRENT_DIR}/raw2'
+    RAW_PATH = f'{CURRENT_DIR}/raw'
 
     def __init__(self) -> None:
         self.cropper = MrCropper()
