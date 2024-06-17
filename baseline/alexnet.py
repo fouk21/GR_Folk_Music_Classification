@@ -14,7 +14,8 @@ class AlexNet(nn.Module):
                 stride=4,
                 padding=2,
             ),
-            nn.ReLU(inplace=True),
+            nn.BatchNorm2d(64),
+            nn.ReLU(inplace=False),
             nn.MaxPool2d(
                 kernel_size=3,
                 stride=2,
@@ -27,7 +28,8 @@ class AlexNet(nn.Module):
                 stride=1,
                 padding=2,
             ),
-            nn.ReLU(inplace=True),
+            nn.BatchNorm2d(192),
+            nn.ReLU(inplace=False),
             nn.MaxPool2d(
                 kernel_size=3,
                 stride=2,
@@ -40,7 +42,8 @@ class AlexNet(nn.Module):
                 stride=1,
                 padding=1,
             ),
-            nn.ReLU(inplace=True),
+            nn.BatchNorm2d(256),
+            nn.ReLU(inplace=False),
             # -------- Conv4 -------- #
             nn.Conv2d(
                 in_channels=256,
@@ -49,7 +52,8 @@ class AlexNet(nn.Module):
                 stride=1,
                 padding=1,
             ),
-            nn.ReLU(inplace=True),
+            nn.BatchNorm2d(384),
+            nn.ReLU(inplace=False),
             # -------- Conv5 -------- #
             nn.Conv2d(
                 in_channels=384,
@@ -58,7 +62,8 @@ class AlexNet(nn.Module):
                 stride=1,
                 padding=1,
             ),
-            nn.ReLU(inplace=True),
+            nn.BatchNorm2d(256),
+            nn.ReLU(inplace=False),
             nn.MaxPool2d(
                 kernel_size=3,
                 stride=2,
@@ -67,18 +72,18 @@ class AlexNet(nn.Module):
 
         self.classifier = nn.Sequential(
             # ---------- FC1 ---------- #
-            nn.Linear(256 * 30 * 18, 4096),
-            nn.ReLU(inplace=True),
+            nn.Linear(256 * 30 * 17, 4096),
+            nn.ReLU(inplace=False),
             nn.Dropout(
                 p=0.5,
-                inplace=True,
+                inplace=False,
             ),
             # ---------- FC2 ---------- #
             nn.Linear(4096, 4096),
-            nn.ReLU(inplace=True),
+            nn.ReLU(inplace=False),
             nn.Dropout(
                 p=0.5,
-                inplace=True,
+                inplace=False,
             ),
             # ---------- FC3 ---------- #
             nn.Linear(4096, num_classes),
@@ -89,8 +94,3 @@ class AlexNet(nn.Module):
         x = torch.flatten(x, 1)
         x = self.classifier(x)
         return x
-
-
-# Example usage
-# model = AlexNet(num_classes=21)
-# print(model)

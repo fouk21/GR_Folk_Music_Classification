@@ -2,7 +2,8 @@ import numpy as np
 import os
 import torch
 
-from simple_cnn import SimpleCNN
+# from simple_cnn import SimpleCNN
+from alexnet import AlexNet
 from sklearn.metrics import (
     accuracy_score,
     classification_report,
@@ -19,14 +20,18 @@ CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 # Define relevant variables for the ML task
 batch_size = 64
-num_classes = 4
-learning_rate = 0.001
-num_epochs = 5
+num_classes = 21
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 all_transforms = transforms.Compose([
     # transforms.Resize((224, 224)),
+    transforms.ColorJitter(
+        brightness=0.2,
+        contrast=0.2,
+        saturation=0.2,
+        hue=0.2
+    ),
     transforms.ToTensor(),
     transforms.Normalize(
         mean=[0.485, 0.456, 0.406],
@@ -45,8 +50,8 @@ test_dataloader = DataLoader(
 )
 
 # Load the trained model
-model = SimpleCNN(4)
-model.load_state_dict(torch.load('cnn_model.pth'))
+model = AlexNet(num_classes)
+model.load_state_dict(torch.load('cnn_model_full.pth'))
 model = model.to(device)
 
 # Set the model to evaluation mode
@@ -60,8 +65,8 @@ with torch.no_grad():  # Disable gradient calculation
         inputs, labels = inputs.to(device), labels.to(device)
         outputs = model(inputs)
         _, preds = torch.max(outputs, 1)
-        all_preds.extend(preds.cpu().numpy())
-        all_labels.extend(labels.cpu().numpy())
+        all_preds.extend(preds.cuda().numpy())
+        all_labels.extend(labels.cuda().numpy())
 
 # Convert lists to numpy arrays
 all_preds = np.array(all_preds)
