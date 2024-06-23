@@ -23,10 +23,31 @@ from sklearn.svm import SVC
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 
-def get_dataset() -> dict:
-    dataset = f'{CURRENT_DIR}/train.csv'
+def get_datasets() -> pd.DataFrame:
+    dataset = f'{CURRENT_DIR}/ml_features.csv'
     df = pd.read_csv(dataset)
 
+    # Check class distribution
+    class_counts = df['label'].value_counts()
+    few_sample_classes = class_counts[class_counts <= 2].index
+
+    # Filter out classes with fewer than 2 samples
+    df_filtered = df[~df['label'].isin(few_sample_classes)]
+
+    # First split into train+validation and test sets
+    train_val, test = train_test_split(
+        df_filtered,
+        test_size=0.2,
+        random_state=42,
+        stratify=df_filtered['label'],
+    )
+
+    test.to_csv(f'{CURRENT_DIR}/svm_test.csv', index=False)
+
+    return train_val
+
+
+def format_input(df: pd.DataFrame) -> dict:
     X = df.drop('label', axis=1)
     labels = df['label']
 
@@ -37,19 +58,19 @@ def get_dataset() -> dict:
     return (X, y, labels)
 
 
-def plot_cm(cm, labels):
+def plot_cm(cm, all_labels):
     # Create a heatmap
     fig, ax = plt.subplots(figsize=(10, 10))
     sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', ax=ax, square=True,
-                xticklabels=np.unique(labels), yticklabels=np.unique(labels))
+                xticklabels=all_labels, yticklabels=all_labels)
 
     # Labels, title, and ticks
     ax.set_xlabel('Predicted labels')
     ax.set_ylabel('True labels')
     ax.set_title('Confusion Matrix')
-    ax.xaxis.set_ticklabels(np.unique(labels))
+    ax.xaxis.set_ticklabels(all_labels)
     ax.xaxis.set_tick_params(rotation=45)
-    ax.yaxis.set_ticklabels(np.unique(labels))
+    ax.yaxis.set_ticklabels(all_labels)
     ax.yaxis.set_tick_params(rotation=0)
     plt.show()
 
@@ -109,21 +130,24 @@ def main():
     )
     svm_logger.addHandler(handler)
 
-    X, y, labels = get_dataset()
+    trainval_df = get_datasets()
 
-    print(X.shape)
+    X, y, labels = format_input(trainval_df)
+
+    all_labels = np.unique(labels)
 
     # breakdown to train/validation
     X_train, X_test, y_train, y_test = train_test_split(
         X,
         y,
         test_size=0.2,
-        random_state=42
+        random_state=42,
+        stratify=y,
     )
 
     start = time.time()
 
-    C = 3
+    C = 1000
     gamma = 0.01
     svm = SVC(
         C=C,
@@ -161,9 +185,9 @@ def main():
     svm_logger.info(f'Matthews Correlation Coefficient: {matthews:0.3f}')
 
     cm = confusion_matrix(y_test, y_pred)
-    plot_cm(cm, labels)
+    plot_cm(cm, all_labels)
 
-    plot_roc(y, y_test, y_score, np.unique(labels))
+    plot_roc(y, y_test, y_score, all_labels)
 
 
 if __name__ == '__main__':
