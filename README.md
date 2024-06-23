@@ -12,7 +12,13 @@ Install `pre-commit` to keep git commits in line:
 
     pip3 install pre-commit
 
-## Application setup
+## Visdom
+
+Before running the CNN train/tests, start the `visdom` server:
+
+    python -m visdom.server
+
+## FastApi Application setup
 
 1. Install `fastapi` and `toml`
 
