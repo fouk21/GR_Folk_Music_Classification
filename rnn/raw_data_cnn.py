@@ -7,6 +7,8 @@ from data_utils import *
 from model import *
 from model_utils import ModelUtils
 import pandas as pd
+import argparse
+import pickle
 
 ##############################################################
 ##############################################################
@@ -28,49 +30,69 @@ import pandas as pd
 ##############################################################
 
 
-# Example usage:
-wav_folder = '../data/cropped'
-frame_length = 0  # Example: 1 second at 44.1 kHz sampling rate
-max_lentgh = 9500000
-data_df = pd.read_csv('dummy_dataset.csv')
-num_classes = data_df['region'].nunique()  # Example: 3 classes for classification
+def main():
 
-# Load data for training
-data, labels = DataUtils.load_raw_data_for_training(wav_folder, frame_length, data_df, max_lentgh, True)
-# Calculate label proportions
-unique_labels, label_counts = np.unique(labels, return_counts=True)
-label_proportions = label_counts / len(labels)
+    parser = argparse.ArgumentParser(description="Arguments for RNN Model")
 
-# Split the data with balanced label distribution
-train_data, temp_data, train_labels, temp_labels = train_test_split(data, labels, train_size=0.7, stratify=labels)
-remaining_size = len(temp_data)
-val_data, test_data, val_labels, test_labels = train_test_split(temp_data, temp_labels, test_size=0.5, stratify=temp_labels)
+    parser.add_argument('wav_folder', type=str, help='Folder with raw audio files')
+    parser.add_argument('max_length', type=int, help='Max audio lentgh')
+    parser.add_argument('dataset_location', type=str, help='CSV Dataset location')
+    parser.add_argument('frame_length', type=int, help='Lentgh of each audio segment')
+    parser.add_argument('results_dir', type=str, help='Folder to store model metrics and results')
+    parser.add_argument('batch_size', type=int, help='Batch size for data loader')
+    parser.add_argument('epochs', type=int, help='Number of training epochs')
 
-train_dataset = CNNAudioDataset(train_data, train_labels)
-val_dataset = CNNAudioDataset(val_data, val_labels)
-test_dataset = CNNAudioDataset(test_data, test_labels)
+    args = parser.parse_args()
 
-batch_size = 2
+    wav_folder = args.wav_folder
+    frame_length = args.frame_length    
+    max_lentgh = args.max_length
+    data_df = pd.read_csv(args.dataset_location)
+    batch_size = args.batch_size
+    results_dir = args.results_dir
+    epochs = args.epochs
+    
+    if not os.path.exists(results_dir):
+        os.makedirs(results_dir)
 
-# Create data loaders
-train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
-test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
+    num_classes = data_df['region'].nunique()
 
-input_shape = data.shape[1]
+    # Load data for training
+    data, labels = DataUtils.load_raw_data_for_training(wav_folder, frame_length, data_df, max_lentgh, True)
+    # Calculate label proportions
+    unique_labels, label_counts = np.unique(labels, return_counts=True)
+    label_proportions = label_counts / len(labels)
 
-model_experiment = ModelUtils(train_loader,val_loader,test_loader,input_shape,num_classes)
+    # Split the data with balanced label distribution
+    train_data, temp_data, train_labels, temp_labels = train_test_split(data, labels, train_size=0.7, stratify=labels)
+    remaining_size = len(temp_data)
+    val_data, test_data, val_labels, test_labels = train_test_split(temp_data, temp_labels, test_size=0.5, stratify=temp_labels)
 
-device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+    train_dataset = CNNAudioDataset(train_data, train_labels)
+    val_dataset = CNNAudioDataset(val_data, val_labels)
+    test_dataset = CNNAudioDataset(test_data, test_labels)
 
-epochs = 1
+    # Create data loaders
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
-input_shape = ()
-path = ''
-model_experiment.model_summary(test_loader, 'raw_data_cnn_model_summary', input_shape, path)
+    print("INFO: Data loaded successfully")
 
-model_experiment.train_cnn(epochs)
+    input_shape = data.shape[1]
 
-model_experiment.test_cnn() #TODO: add path
+    model_experiment = ModelUtils(train_loader,val_loader,test_loader,input_shape,num_classes)
 
-model_experiment.save_model() #TODO: add path
+    device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+
+    model_experiment.train_cnn(epochs)
+
+    model_experiment.test_cnn(results_dir)
+
+    model_experiment.model_summary('raw_data_rnn_model_summary', results_dir)
+
+    model_experiment.save_model(results_dir+'model.pth')
+
+    with open(results_dir+'model_experiment.pkl', 'wb') as file:
+        pickle.dump(model_experiment, file)
+        print("INFO: pickled model class at: ", results_dir+'model_experiment.pkl')    

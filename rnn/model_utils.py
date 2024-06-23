@@ -212,6 +212,8 @@ class ModelUtils():
 
     def train_evaluate(self, params, plot=False, save_path=None, epochs=1):
 
+        print("INFO: Started Model Training")
+
         early_stopping = EarlyStopping(tolerance=2, min_delta=18)
         rnn_kwargs = {'num_layers':params['num_layers'], 
                       'batch_first':True, 
@@ -260,9 +262,9 @@ class ModelUtils():
             plt.ylabel('accuracy')
             plt.legend(['Train', 'Validation'])
             plt.title('Train vs Validation Accuracy')
-            plt.show()
             if save_path:
                 plt.savefig(save_path+'accuracy_curve.png')
+            plt.show()
 
             plt.plot(train_losses,'-o')
             plt.plot(val_losses,'-o')
@@ -270,9 +272,9 @@ class ModelUtils():
             plt.ylabel('losses')
             plt.legend(['Train', 'Validation'])
             plt.title('Train vs Validation Losses')
-            plt.show()
             if save_path:
                 plt.savefig(save_path+'loss_curve.png')
+            plt.show()
         
         #torch.save(self._model, 'model.pt')
         return val_acc
@@ -413,4 +415,3 @@ class ModelTuning:
 
 
 #TODO: ADD EARLY STOPPING plot stopping
-#TODO: ADD ARGUMENTS IN MAIN

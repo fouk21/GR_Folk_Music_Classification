@@ -113,14 +113,3 @@ class CNNModel(nn.Module):
         x = x.mean(dim=-1)  # Global Average Pooling (GAP)
         x = self.fc(x)
         return x#F.log_softmax(x, dim=-1)
-    
-# Wrapper Model for Summary
-class WrapperModel(nn.Module):
-    def __init__(self, model):
-        super(WrapperModel, self).__init__()
-        self.model = model
-
-    def forward(self, x):
-        # Create a dummy additional input tensor
-        additional_input = torch.Tensor([216])
-        return self.model(x, additional_input)

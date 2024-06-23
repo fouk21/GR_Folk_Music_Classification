@@ -55,7 +55,6 @@ def main():
 
     args = parser.parse_args()
 
-    # Example usage:
     wav_folder = args.wav_folder  #'../data/cropped'
     frame_length = args.frame_length    #44100  # Example: 1 second at 44.1 kHz sampling rate
     max_lentgh = args.max_length #9500000
@@ -99,14 +98,14 @@ def main():
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, collate_fn=collate_fn)
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, collate_fn=collate_fn)
 
+    print("INFO: Data loaded successfully")
+
     input_shape = data.shape[2]
 
+    # RNN model instantiation
     model_experiment = ModelUtils(train_loader,val_loader,test_loader,input_shape,num_classes)
 
     device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
-
-
-    
 
     input_shape = data.shape[1:]
 
@@ -114,15 +113,17 @@ def main():
     if not os.path.exists(results_dir):
         os.makedirs(results_dir)
 
-    model_experiment.train_evaluate(params)
+    model_experiment.train_evaluate(params,True,results_dir,epochs)
 
     model_experiment.test_model(results_dir)
 
     model_experiment.model_summary('raw_data_rnn_model_summary', results_dir)
 
-    # with open(path+'model_experiment.pkl', 'wb') as file:
-    #     pickle.dump(model_experiment, file)
-    #     print("INFO: pickled model class at: ", path+'model_experiment.pkl')
+    model_experiment.save_model(results_dir+'model.pth')
+
+    with open(results_dir+'model_experiment.pkl', 'wb') as file:
+        pickle.dump(model_experiment, file)
+        print("INFO: pickled model class at: ", results_dir+'model_experiment.pkl')
 
 if __name__ == "__main__":
     main()
