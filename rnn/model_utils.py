@@ -1,11 +1,15 @@
+from itertools import cycle
+from torchsummary import summary
 from tqdm import tqdm
 import torch
+import numpy as np
 from model import *
 import matplotlib.pyplot as plt
 import optuna
 import torch.nn.functional as F
+from torchviz import make_dot
 
-from sklearn.metrics import confusion_matrix, classification_report, accuracy_score, roc_auc_score, roc_curve
+from sklearn.metrics import auc, confusion_matrix, classification_report, accuracy_score, roc_auc_score, roc_curve
 
 from optuna.visualization import plot_contour
 from optuna.visualization import plot_edf
@@ -14,6 +18,8 @@ from optuna.visualization import plot_optimization_history
 from optuna.visualization import plot_parallel_coordinate
 from optuna.visualization import plot_param_importances
 from optuna.visualization import plot_slice
+
+from sklearn.preprocessing import label_binarize
 
 class ModelUtils():
 
@@ -30,6 +36,7 @@ class ModelUtils():
         self._criterion = None
         self._input_shape = input_shape
         self._numClasses = num_classes
+        #self.class_map = class_map
 
     @property
     def model(self):
@@ -61,7 +68,7 @@ class ModelUtils():
         epoch_loss = 0
         epoch_acc = 0
         with tqdm(self._train_dataloader, unit="batch") as tepoch:  # Wrap the dataloader with tqdm
-            tepoch.set_description(f"Epoch {epoch_num+1}/{self._epochs}")
+            tepoch.set_description(f"Epoch {epoch_num}/{self._epochs}")
             for batch_data, batch_labels, seq_lengths in tepoch:
                 batch_data, batch_labels = batch_data.to(self._device), batch_labels.to(self._device)
                 seq_lengths = seq_lengths.cpu()
@@ -81,11 +88,13 @@ class ModelUtils():
                 if grad_clip:
                     for param in self._model.parameters():
                         if param.grad is None:
-                            print("grad_clip")
+                            print("INFO: Grad Clip!")
                             continue
                         grad_val = torch.clamp(param.grad, -5, 5)
                 
                 self._optimizer.step()
+
+                self._scheduler.step()
                 
                 epoch_loss += loss.item()
                 epoch_acc += acc.item()
@@ -109,9 +118,7 @@ class ModelUtils():
                 predictions = self._model(data,seq_lengths)
                 loss = self._criterion(predictions,labels)
 
-                pred_classes = torch.argmax(F.softmax(predictions, dim=1),dim=1)#torch.round(torch.sigmoid(predictions))
-                # print(pred_classes.shape)
-                # print(batch_labels.shape)
+                pred_classes = torch.argmax(F.softmax(predictions, dim=1),dim=1)
                 correct_preds = (pred_classes == labels).float()
 
                 accuracy = correct_preds.sum()/len(correct_preds)
@@ -121,14 +128,68 @@ class ModelUtils():
 
         return total_loss/len(self._validation_dataloader), total_acc/len(self._validation_dataloader)
     
-    def test_model(self):
+    def print_model_metrics(self, y_test, y_pred_list, save_path):
+        print("--------------------------------------------")
+        print("Model confusion matrix: \n",confusion_matrix(y_test, y_pred_list))
+        print("--------------------------------------------")
+        print("Model classification report: \n",classification_report(y_test, y_pred_list))
+        print("--------------------------------------------")
+        print("Model accuracy: ",accuracy_score(y_test, y_pred_list))
+        print("--------------------------------------------")
+
+        with open(save_path+'metrics.txt', 'a') as file:
+            print("--------------------------------------------",file=file)
+            print("Model confusion matrix: \n",confusion_matrix(y_test, y_pred_list),file=file)
+            print("--------------------------------------------",file=file)
+            print("Model classification report: \n",classification_report(y_test, y_pred_list),file=file)
+            print("--------------------------------------------",file=file)
+            print("Model accuracy: ",accuracy_score(y_test, y_pred_list),file=file)
+            print("--------------------------------------------",file=file)
+
+    def plot_roc_curve(self, y_test, y_pred_prob_list, save_path):
+        #  Convert to numpy array if it is not already
+        y_pred_prob_list = np.array(y_pred_prob_list)
+        y_test = np.array(y_test)
+
+        y_test_bin = label_binarize(y_test, classes=np.arange(self._numClasses))
+        # Initialize dictionaries to hold false positive rates, true positive rates, and ROC AUC values
+        fpr = dict()
+        tpr = dict()
+        roc_auc = dict()
+
+        
+        # Compute ROC curve and ROC area for each class
+        for i in range(self._numClasses):
+            fpr[i], tpr[i], _ = roc_curve(y_test_bin[:, i], y_pred_prob_list[:, i])
+            roc_auc[i] = auc(fpr[i], tpr[i])
+
+        # Plot all ROC curves
+        plt.figure()
+        colors = cycle(['aqua', 'darkorange', 'cornflowerblue', 'navy', 'purple', 'green', 'red', 'blue', 'cyan', 'magenta'])
+        for i, color in zip(range(self._numClasses), colors):
+            plt.plot(fpr[i], tpr[i], color=color, lw=2,
+                     label='ROC curve of class {0} (area = {1:0.2f})'
+                     ''.format(i, roc_auc[i]))
+
+        plt.plot([0, 1], [0, 1], 'k--', lw=2)
+        plt.xlim([0.0, 1.0])
+        plt.ylim([0.0, 1.05])
+        plt.xlabel('False Positive Rate')
+        plt.ylabel('True Positive Rate')
+        plt.title('Receiver Operating Characteristic for Multiclass')
+        plt.legend(loc="lower right")
+        plt.savefig(save_path+'roc_curve.png')
+        plt.show()        
+
+#TODO: ADD CLASS MAPPING
+    def test_model(self, path):
     
         y_test = []
         y_pred_list = []
         y_pred_prob_list = []
-        self._model.eval() # set the model in evaluation mode to not compute gradients and reduce overhead
+        self._model.eval()
         
-        with torch.no_grad(): # turn of gradients calculation 
+        with torch.no_grad():
             
             for batch in self._test_dataloader:
 
@@ -140,38 +201,18 @@ class ModelUtils():
                 pred_classes = torch.argmax(F.softmax(predictions, dim=1),dim=1)
 
                 y_pred_list += pred_classes.tolist()
-                #print(torch.max(predictions, dim=1).values)
-                y_pred_prob_list += torch.max(predictions, dim=1).values.tolist()
+                y_pred_prob_list += predictions.tolist()
                 
                 y_test += labels.tolist()
         
             
-        print("--------------------------------------------")
-        print("Model confusion matrix: \n",confusion_matrix(y_test, y_pred_list))
-        print("--------------------------------------------")
-        print("Model classification report: \n",classification_report(y_test, y_pred_list))
-        print("--------------------------------------------")
-        print("Model accuracy: ",accuracy_score(y_test, y_pred_list))
-        print("--------------------------------------------")
+        self.print_model_metrics(y_test, y_pred_list, path)
 
-        
-        false_positive_rate, true_positive_rate, threshold = roc_curve(y_test, y_pred_prob_list)
-        print("--------------------------------------------")
-        print('roc_auc_score for model: ', roc_auc_score(y_test, y_pred_prob_list))
-        print("--------------------------------------------")
-        plt.title('Receiver Operating Characteristic - RNN')
-        plt.plot(false_positive_rate, true_positive_rate)
-        plt.plot([0, 1], ls="--")
-        plt.plot([0, 0], [1, 0] , c=".7"), plt.plot([1, 1] , c=".7")
-        plt.ylabel('True Positive Rate')
-        plt.xlabel('False Positive Rate')
-        plt.show()
-        
+        self.plot_roc_curve(y_test, y_pred_prob_list, path)
 
-    def train_evaluate(self, params, plot=False, epochs=1):
+    def train_evaluate(self, params, plot=False, save_path=None, epochs=1):
 
         early_stopping = EarlyStopping(tolerance=2, min_delta=18)
-        #TODO: ADD BIDIRECTIONAL TO PARAMS
         rnn_kwargs = {'num_layers':params['num_layers'], 
                       'batch_first':True, 
                       'dropout':params['dropout_probability']
@@ -189,11 +230,10 @@ class ModelUtils():
                                skip_connections, hidden_layers, hidden_size, 
                                cell_type, bidirectional, **rnn_kwargs).to(self._device)
 
-        #TODO CHANGE LOSS FN
-        self._criterion = torch.nn.CrossEntropyLoss()    #has sigmoid integrated
-        #TODO: FIX LR TO BE PASSED DYNAMICALLY TO CLASS
+        self._criterion = torch.nn.CrossEntropyLoss()    #has softmax integrated
         lr = params['learning_rate'] #learning rate for optimizer
-        self._optimizer = torch.optim.Adam(self._model.parameters(),lr=lr) 
+        self._optimizer = torch.optim.Adam(self._model.parameters(),lr=lr)
+        self._scheduler = torch.optim.lr_scheduler.StepLR(self._optimizer, step_size=10, gamma=0.1)
         #return
         train_losses, train_accs = [], []
         acc = []
@@ -209,7 +249,7 @@ class ModelUtils():
             # early stopping
             early_stopping(epoch_loss, val_loss)
             if early_stopping.early_stop:
-                print(f"\nEnding early. Converged in {epoch} epochs.")
+                print(f"\nINFO: Ending early. Converged in {epoch} epochs.")
                 break
                 
         if plot:
@@ -221,6 +261,8 @@ class ModelUtils():
             plt.legend(['Train', 'Validation'])
             plt.title('Train vs Validation Accuracy')
             plt.show()
+            if save_path:
+                plt.savefig(save_path+'accuracy_curve.png')
 
             plt.plot(train_losses,'-o')
             plt.plot(val_losses,'-o')
@@ -229,9 +271,90 @@ class ModelUtils():
             plt.legend(['Train', 'Validation'])
             plt.title('Train vs Validation Losses')
             plt.show()
+            if save_path:
+                plt.savefig(save_path+'loss_curve.png')
         
-        torch.save(self._model, 'model.pt')
-        return self._model
+        #torch.save(self._model, 'model.pt')
+        return val_acc
+
+    def train_cnn(self, epochs):
+        self._model = CNNModel(self._numClasses)
+        self._model.to(self._device)
+        criterion = nn.CrossEntropyLoss()
+        optimizer = torch.optim.Adam(self._model.parameters(), lr=0.0001)
+        for epoch in range(1, epochs + 1):
+            # Training phase
+            self._model.train()
+            train_loss = 0.0
+            for batch_idx, (data, target) in enumerate(tqdm(self._train_dataloader, desc=f"Training Epoch {epoch}")):
+                data = data.to(torch.float32)
+                data, target = data.to(self._device), target.to(self._device)
+                optimizer.zero_grad()
+                output = self._model(data)
+                #TODO: CHECK ACTIVATION FUNCTION
+                loss = criterion(output, target)
+                loss.backward()
+                optimizer.step()
+                train_loss += loss.item()
+            avg_train_loss = train_loss / len(self._train_dataloader)
+            print(f'====> Epoch: {epoch} Average training loss: {avg_train_loss:.4f}')
+
+            # Validation phase
+            self._model.eval()
+            val_loss = 0
+            correct = 0
+            with torch.no_grad():
+                for data, target in tqdm(self._validation_dataloader, desc="Validating"):
+                    data, target = data.to(self._device), target.to(self._device)
+                    output = self._model(data)
+                    val_loss += criterion(output, target).item()
+                    #pred = output.argmax(dim=1, keepdim=True)
+                    pred = torch.argmax(F.log_softmax(output, dim=-1),dim=1)
+                    correct += pred.eq(target.view_as(pred)).sum().item()
+            avg_val_loss = val_loss / len(self._validation_dataloader)
+            val_accuracy = correct / len(self._validation_dataloader)
+            print(f'====> Validation set: Average loss: {avg_val_loss:.4f}, Accuracy: {correct}/{len(self._validation_dataloader)} ({100. * val_accuracy:.2f}%)')
+
+    def test_cnn(self, path):
+    
+        y_test = []
+        y_pred_list = []
+        y_pred_prob_list = []
+        self._model.eval()
+        
+        with torch.no_grad():
+            
+            for batch in self._test_dataloader:
+
+                data, labels = batch[0], batch[1]
+                data, labels= data.to(self._device), labels.to(self._device)
+                predictions = self._model(data)
+                predictions = predictions.cpu()
+                pred_classes = torch.argmax(F.log_softmax(predictions, dim=-1),dim=1)
+
+                y_pred_list += pred_classes.tolist()
+                y_pred_prob_list += predictions.tolist()
+                
+                y_test += labels.tolist()
+        
+            
+        self.print_model_metrics(y_test, y_pred_list, path)
+
+        self.plot_roc_curve(y_test, y_pred_prob_list, path)
+
+    def load_model(self, model_path):
+        self._model = torch.load(model_path)
+        print("INFO: Loaded model: ", model_path)
+
+    def save_model(self, model_path):
+        torch.save(self._model,model_path)
+        print("INFO: Model Saved at: ", model_path)
+        pass
+
+    def model_summary(self, model_name, save_path):
+        print("\n",self._model)
+        with open(save_path+model_name+'.txt', 'a') as file:
+            print(self._model, file=file)
 
 class EarlyStopping:
     
@@ -248,7 +371,6 @@ class EarlyStopping:
             if self.counter >= self.tolerance:  
                 self.early_stop = True
 
-#TODO: FIX TUNING
 class ModelTuning:
 
     def __init__(self, model_experiment) -> None:
@@ -260,35 +382,35 @@ class ModelTuning:
     
         params = {
                 'learning_rate': trial.suggest_categorical('learning_rate', [0.0001, 0.001]),
-                'num_layers': trial.suggest_categorical('num_layers', [1, 2, 3]),
+                'num_layers': trial.suggest_categorical('num_layers', [1, 2]),
                 'skip_connections': trial.suggest_categorical('skip_connections', [True, False]),
-                'dropout_probability': trial.suggest_categorical('dropout_probability', [0.0, 0.2, 0.3]),
+                'dropout_probability': trial.suggest_categorical('dropout_probability', [0.0, 0.2, 0.5]),
                 'hidden_layers': trial.suggest_categorical('hidden_layers', [1, 2]),
                 'gradient_clipping': trial.suggest_categorical('gradient_clipping', [True, False]),
-                'cell_type': trial.suggest_categorical('cell_type', ['lstm', 'gru']),
-                'hidden_size': trial.suggest_categorical('hidden_size', [128, 64])
+                'cell_type': trial.suggest_categorical('cell_type', ['lstm', 'gru', 'rnn']),
+                'hidden_size': trial.suggest_categorical('hidden_size', [128, 64]),
+                'learning_rate': trial.suggest_categorical('learning_rate', [0.001, 0.0001]),
+                'bidirectional': trial.suggest_categorical('bidirectional', [True, False]),
                 }
         
-        return self.model_experiment.train_evaluate(params,False,1)
+        return self.model_experiment.train_evaluate(params,False,None,1)
     
     def finetune_model(self):
         self.study.optimize(self.objective, n_trials=30)
 
         self.best_trial = self.study.best_trial
 
-        print("Best model hyperparameters:")
+        print("INFO: Best model hyperparameters:")
         for key, value in self.best_trial.params.items():
             print("{} : {}".format(key, value))
     
     def plot_tuning(self):
         plot_optimization_history(self.study)
         plot_parallel_coordinate(self.study)
-        optuna.visualization.plot_param_importances(self.study)
-        optuna.visualization.plot_contour(self.study, params=['num_layers', 'hidden_size'])
-        optuna.visualization.plot_contour(self.study, params=['cell_type', 'num_layers'])
+        plot_param_importances(self.study)
+        plot_contour(self.study, params=['num_layers', 'hidden_size'])
+        plot_contour(self.study, params=['cell_type', 'num_layers'])
 
 
-#TODO: ADD LOGS TO FILES
-#TODO: SAVE PLOTS TO FILES
-#TODO: ADD MODEL SAVE
-
+#TODO: ADD EARLY STOPPING plot stopping
+#TODO: ADD ARGUMENTS IN MAIN

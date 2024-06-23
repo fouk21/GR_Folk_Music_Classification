@@ -37,7 +37,11 @@ class SoundUtils:
                 # Truncate the audio if it's longer than fixed_length
                 audio = audio[:fixed_length]
             #audio = (audio - np.mean(audio)) / np.std(audio)
-            audio_frames = SoundUtils.segment_audio(audio, frame_length)
-            return np.array(audio_frames)
+            if frame_length != 0:
+                audio_frames = SoundUtils.segment_audio(audio, frame_length)
+                return np.array(audio_frames)
+            else:
+                audio = (audio - np.mean(audio)) / np.std(audio)
+                return np.array(audio)
         else:
             return audio

@@ -11,36 +11,34 @@ class DataUtils():
 
     @staticmethod
     # Function to load WAV files and prepare data for training
-    def load_data_for_training(wav_folder, frame_length, fixed_length=None):
-        file_names = os.listdir(wav_folder)
-        file_paths = [os.path.join(wav_folder, file) for file in file_names]
+    def load_raw_data_for_training(wav_folder, frame_length, data_df, fixed_length=None, noSegmentation=False):
         
         data = []
         labels = []
-        
+
+        unique_regions = data_df['region'].unique()
+        class_mapping = {region: idx for idx, region in enumerate(unique_regions)}
+        data_df['region'] = data_df['region'].map(class_mapping)
+
+        ids = data_df['id'].to_list()
+        labels = data_df['region'].to_list()
+        if len(ids) != len(labels):
+            print("Data and labels missmatch detected!")
+
+        file_paths = [os.path.join(wav_folder,id+'.mp3') for id in ids]
+            
         for file_path in file_paths:
-            audio_data = SoundUtils.load_wav(file_path, frame_length=frame_length, fixed_length=fixed_length)
-            
+            if noSegmentation:
+                audio_data = SoundUtils.load_wav(file_path, frame_length=0, fixed_length=fixed_length)
+            else:
+                audio_data = SoundUtils.load_wav(file_path, frame_length=frame_length, fixed_length=fixed_length)
             data.append(audio_data)  # Extend instead of append to flatten the list
-            
-            # Assuming labels based on file names or your dataset structure
-            # Adjust as per your dataset
-            # label = int(file_path.split('_')[1])  # Example: extracting label from filename
-            labels.extend([0] * len(audio_data))  # Placeholder for labels, adjust accordingly
         #data = data / np.max(np.abs(data),axis=-1, keepdims=True)
         return np.asarray(data), np.asarray(labels)
-
+    
     @staticmethod
-    def preprocess_data(input_data, labels, frame_length):
-        # Convert input_data to a numpy array
-        input_data = np.array(input_data)
-        
-        #TODO: CHECK STEREO AUDIO
-        # Example: Reshape if necessary (adjust according to your data structure)
-        
-        #input_data = input_data.reshape(-1, frame_length, 1)  # Assuming mono audio
-        
-        return input_data, labels
+    def preprocess_feature_data():
+        pass
 
 # Custom Dataset class
 class AudioDataset(Dataset):
@@ -70,6 +68,20 @@ class AudioDataset(Dataset):
                     seq_length += 1
             lengths.append(seq_length)
         return lengths
+    
+class CNNAudioDataset(Dataset):
+    def __init__(self, data, labels):
+        self.data = data
+        self.labels = labels
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, idx):
+        # Assuming data[idx] is of shape [AUDIO_LENGTH]
+        # Reshape it to [1, AUDIO_LENGTH] for Conv1D input
+        sample = self.data[idx].reshape(1, -1)  # Reshape to [1, AUDIO_LENGTH]
+        return sample, self.labels[idx]
     
 def collate_fn(batch):
     data, labels, lengths = zip(*batch)
