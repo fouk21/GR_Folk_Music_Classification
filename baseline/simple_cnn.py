@@ -10,6 +10,7 @@ class SimpleCNN(nn.Module):
             out_channels=32,
             kernel_size=3,
             stride=1,
+            padding=1,
         )
         self.conv_layer2 = nn.Conv2d(
             in_channels=32,
@@ -18,7 +19,7 @@ class SimpleCNN(nn.Module):
             stride=1,
         )
         self.max_pool = nn.MaxPool2d(
-            kernel_size=2,
+            kernel_size=3,
             stride=2,
         )
         self.fc1 = nn.Linear(248 * 148 * 64, 128)
