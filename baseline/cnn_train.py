@@ -11,7 +11,7 @@ import visdom
 
 from alexnet import AlexNet
 from PIL import Image, ImageDraw
-# from simple_cnn import SimpleCNN
+from simple_cnn import SimpleCNN
 from sklearn.metrics import accuracy_score
 from torch.utils.data import DataLoader, random_split
 from torchsummary import summary
@@ -20,8 +20,8 @@ from torchvision import datasets, transforms
 
 # Define PY script folder
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
-IMAGE_PATH = f'{CURRENT_DIR}/../data/spectrograms'
-# IMAGE_PATH = f'{CURRENT_DIR}/../data/test_cnn'
+IMAGE_PATH = f'{CURRENT_DIR}/../dataset/spectrograms/train'
+IMAGE_PATH = f'{CURRENT_DIR}/../dataset/mel-spectrograms/train'
 
 
 def plot_fig(ids, title, nrows=5, ncols=15):
@@ -329,7 +329,10 @@ def cnn_train():
         )
 
     # Save the trained model
-    torch.save(model.state_dict(), 'cnn_model.pth')
+    # torch.save(model.state_dict(), 'cnn_alex_spec.pth')
+    torch.save(model.state_dict(), 'cnn_simple_spec.pth')
+    # torch.save(model.state_dict(), 'cnn_alex_mel_spec.pth')
+    # torch.save(model.state_dict(), 'cnn_simple_mel_spec.pth')
 
 
 def main():
