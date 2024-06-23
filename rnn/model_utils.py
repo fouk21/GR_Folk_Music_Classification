@@ -1,5 +1,4 @@
 from itertools import cycle
-from torchsummary import summary
 from tqdm import tqdm
 import torch
 import numpy as np
@@ -7,23 +6,17 @@ from model import *
 import matplotlib.pyplot as plt
 import optuna
 import torch.nn.functional as F
-from torchviz import make_dot
-
 from sklearn.metrics import auc, confusion_matrix, classification_report, accuracy_score, roc_auc_score, roc_curve
-
 from optuna.visualization import plot_contour
-from optuna.visualization import plot_edf
-from optuna.visualization import plot_intermediate_values
 from optuna.visualization import plot_optimization_history
 from optuna.visualization import plot_parallel_coordinate
 from optuna.visualization import plot_param_importances
-from optuna.visualization import plot_slice
-
 from sklearn.preprocessing import label_binarize
+import pickle
 
 class ModelUtils():
 
-    def __init__(self, train_loader, val_loader, test_loader, input_shape, num_classes) -> None:
+    def __init__(self, train_loader, val_loader, test_loader, input_shape, num_classes, class_map) -> None:
         # Check for CUDA
         #TODO: CHANGE MPS
         self._device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
@@ -36,7 +29,8 @@ class ModelUtils():
         self._criterion = None
         self._input_shape = input_shape
         self._numClasses = num_classes
-        #self.class_map = class_map
+        self.class_map = class_map
+        self.decoding = {idx: label for label, idx in self.class_map.items()}
 
     @property
     def model(self):
@@ -84,7 +78,6 @@ class ModelUtils():
 
                 loss.backward()
                 
-                #TODO: CHECK GRAD CLIPING
                 if grad_clip:
                     for param in self._model.parameters():
                         if param.grad is None:
@@ -132,7 +125,9 @@ class ModelUtils():
         print("--------------------------------------------")
         print("Model confusion matrix: \n",confusion_matrix(y_test, y_pred_list))
         print("--------------------------------------------")
-        print("Model classification report: \n",classification_report(y_test, y_pred_list))
+        y_true_labels = [self.decoding[num] for num in y_test]
+        y_pred_labels = [self.decoding[num] for num in y_pred_list]
+        print("Model classification report: \n",classification_report(y_true_labels, y_pred_labels,target_names=list(self.class_map.keys())))
         print("--------------------------------------------")
         print("Model accuracy: ",accuracy_score(y_test, y_pred_list))
         print("--------------------------------------------")
@@ -141,7 +136,9 @@ class ModelUtils():
             print("--------------------------------------------",file=file)
             print("Model confusion matrix: \n",confusion_matrix(y_test, y_pred_list),file=file)
             print("--------------------------------------------",file=file)
-            print("Model classification report: \n",classification_report(y_test, y_pred_list),file=file)
+            y_true_labels = [self.decoding[num] for num in y_test]
+            y_pred_labels = [self.decoding[num] for num in y_pred_list]
+            print("Model classification report: \n",classification_report(y_true_labels, y_pred_labels,target_names=list(self.class_map.keys())),file=file)            
             print("--------------------------------------------",file=file)
             print("Model accuracy: ",accuracy_score(y_test, y_pred_list),file=file)
             print("--------------------------------------------",file=file)
@@ -156,7 +153,6 @@ class ModelUtils():
         fpr = dict()
         tpr = dict()
         roc_auc = dict()
-
         
         # Compute ROC curve and ROC area for each class
         for i in range(self._numClasses):
@@ -280,6 +276,8 @@ class ModelUtils():
         return val_acc
 
     def train_cnn(self, epochs):
+        
+        print("INFO: Model Training Started")
         self._model = CNNModel(self._numClasses)
         self._model.to(self._device)
         criterion = nn.CrossEntropyLoss()
@@ -391,20 +389,22 @@ class ModelTuning:
                 'gradient_clipping': trial.suggest_categorical('gradient_clipping', [True, False]),
                 'cell_type': trial.suggest_categorical('cell_type', ['lstm', 'gru', 'rnn']),
                 'hidden_size': trial.suggest_categorical('hidden_size', [128, 64]),
-                'learning_rate': trial.suggest_categorical('learning_rate', [0.001, 0.0001]),
                 'bidirectional': trial.suggest_categorical('bidirectional', [True, False]),
                 }
         
         return self.model_experiment.train_evaluate(params,False,None,1)
     
-    def finetune_model(self):
-        self.study.optimize(self.objective, n_trials=30)
+    def finetune_model(self, n_trials, save_path):
+        self.study.optimize(self.objective, n_trials=n_trials)
 
         self.best_trial = self.study.best_trial
 
         print("INFO: Best model hyperparameters:")
         for key, value in self.best_trial.params.items():
             print("{} : {}".format(key, value))
+
+        with open(save_path, 'wb') as file:
+            pickle.dump(self.best_trial.params,file)
     
     def plot_tuning(self):
         plot_optimization_history(self.study)

@@ -58,7 +58,7 @@ def main():
     num_classes = data_df['region'].nunique()
 
     # Load data for training
-    data, labels = DataUtils.load_raw_data_for_training(wav_folder, frame_length, data_df, max_lentgh, True)
+    data, labels, class_mapping = DataUtils.load_raw_data_for_training(wav_folder, frame_length, data_df, max_lentgh, True)
     # Calculate label proportions
     unique_labels, label_counts = np.unique(labels, return_counts=True)
     label_proportions = label_counts / len(labels)
@@ -81,7 +81,7 @@ def main():
 
     input_shape = data.shape[1]
 
-    model_experiment = ModelUtils(train_loader,val_loader,test_loader,input_shape,num_classes)
+    model_experiment = ModelUtils(train_loader,val_loader,test_loader,input_shape,num_classes,class_mapping)
 
     device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 
