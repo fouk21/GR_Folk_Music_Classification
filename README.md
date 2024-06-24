@@ -12,7 +12,7 @@ Harmonies of Heritage: Classifying Traditional Greek Folk Songs by Region using 
 
 ## Presentation
 
-[Find the presentation here.]('Harmonies of Heritage.pptx')
+[Find the presentation here.](Harmonies_of_Heritage.pptx)
 
 ## Development
 
