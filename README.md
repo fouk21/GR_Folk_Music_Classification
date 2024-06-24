@@ -10,6 +10,10 @@ Harmonies of Heritage: Classifying Traditional Greek Folk Songs by Region using 
 
 [Find the report here.](Report.pdf)
 
+## Presentation
+
+[Find the presentation here.]("Harmonies of Heritage.pptx")
+
 ## Development
 
 Install `pre-commit` to keep git commits in line:
