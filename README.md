@@ -6,6 +6,10 @@ Harmonies of Heritage: Classifying Traditional Greek Folk Songs by Region using 
 ![python version](https://badgen.net/badge/python/3.11/blue)
 ![pre-commit](https://badgen.net/badge/pre-commit/3.6.0/green)
 
+## Report
+
+[Find the report here.](Report.pdf)
+
 ## Development
 
 Install `pre-commit` to keep git commits in line:
