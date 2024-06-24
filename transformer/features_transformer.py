@@ -71,8 +71,8 @@ def main():
         os.makedirs(results_dir)
 
     # Parameters for the transformer
-    feature_dim = data.shape[2]  # Dimension of features per frame
-    nhead = feature_dim / 5  # Number of attention heads
+    feature_dim = 28  # Dimension of features per frame
+    nhead = 4  # Number of attention heads
     num_encoder_layers = 3  # Number of transformer encoder layers
     dim_feedforward = 256  # Dimension of feedforward network
     dropout = 0.1  # Dropout rate

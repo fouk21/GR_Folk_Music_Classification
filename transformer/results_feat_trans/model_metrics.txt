@@ -1,0 +1,78 @@
+Model classification report: 
+                  precision    recall  f1-score   support
+
+     Aegean-sea       0.22      1.00      0.36        48
+     Asia-minor       0.00      0.00      0.00        21
+ Central-Greece       0.00      0.00      0.00         9
+          Crete       0.00      0.00      0.00         9
+         Cyprus       0.00      0.00      0.00         1
+          Egypt       0.00      0.00      0.00         1
+         Epirus       0.00      0.00      0.00        34
+         Euboea       0.00      0.00      0.00         5
+     Ionian-sea       0.00      0.00      0.00         8
+        Kythira       0.00      0.00      0.00         1
+      Macedonia       0.00      0.00      0.00        17
+Mainland-Greece       0.00      0.00      0.00        30
+    Peloponnese       0.00      0.00      0.00        11
+         Pontus       0.00      0.00      0.00        13
+        Romania       0.00      0.00      0.00         1
+ Southern-Italy       0.00      0.00      0.00         4
+       Thessaly       0.00      0.00      0.00         3
+         Thrace       0.00      0.00      0.00         5
+
+       accuracy                           0.22       221
+      macro avg       0.01      0.06      0.02       221
+   weighted avg       0.05      0.22      0.08       221
+
+Model classification report: 
+                  precision    recall  f1-score   support
+
+     Aegean-sea       0.50      0.65      0.56        48
+     Asia-minor       0.38      0.27      0.32        22
+ Central-Greece       0.31      0.44      0.36         9
+          Crete       0.50      0.22      0.31         9
+         Cyprus       0.00      0.00      0.00         1
+          Egypt       0.00      0.00      0.00         1
+         Epirus       0.48      0.44      0.46        34
+         Euboea       0.33      0.20      0.25         5
+     Ionian-sea       0.29      0.25      0.27         8
+        Kythira       0.00      0.00      0.00         1
+      Macedonia       0.27      0.35      0.31        17
+Mainland-Greece       0.56      0.63      0.59        30
+    Peloponnese       0.50      0.40      0.44        10
+         Pontus       0.45      0.38      0.42        13
+        Romania       0.00      0.00      0.00         1
+ Southern-Italy       1.00      0.60      0.75         5
+       Thessaly       0.00      0.00      0.00         3
+         Thrace       0.00      0.00      0.00         4
+
+       accuracy                           0.44       221
+      macro avg       0.31      0.27      0.28       221
+   weighted avg       0.44      0.44      0.43       221
+
+Model classification report: 
+                  precision    recall  f1-score   support
+
+     Aegean-sea       0.56      0.50      0.53        48
+     Asia-minor       0.50      0.57      0.53        21
+ Central-Greece       0.40      0.44      0.42         9
+          Crete       0.38      0.33      0.35         9
+         Cyprus       0.00      0.00      0.00         2
+          Egypt       1.00      1.00      1.00         1
+         Epirus       0.67      0.35      0.46        34
+         Euboea       0.25      0.20      0.22         5
+     Ionian-sea       0.57      1.00      0.73         8
+        Kythira       0.00      0.00      0.00         1
+      Macedonia       0.32      0.41      0.36        17
+Mainland-Greece       0.65      0.73      0.69        30
+    Peloponnese       0.44      0.40      0.42        10
+         Pontus       0.80      0.62      0.70        13
+        Romania       0.00      0.00      0.00         1
+ Southern-Italy       0.33      0.25      0.29         4
+       Thessaly       0.22      0.67      0.33         3
+         Thrace       0.38      0.60      0.46         5
+
+       accuracy                           0.51       221
+      macro avg       0.41      0.45      0.42       221
+   weighted avg       0.53      0.51      0.50       221
+

@@ -10,46 +10,46 @@ import torch
 def train_model(model, train_loader, val_loader, num_epochs=25, learning_rate=1e-3):
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-    
+
     for epoch in range(num_epochs):
         model.train()
         running_loss = 0.0
-        
+
         for inputs, labels, _ in train_loader:
             optimizer.zero_grad()
-            
+
             outputs = model(inputs)
             loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
-            
+
             running_loss += loss.item() * inputs.size(0)
-        
+
         epoch_loss = running_loss / len(train_loader.dataset)
-        
+
         val_loss, val_acc = validate_model(model, val_loader)
-        
+
         print(f"Epoch {epoch}/{num_epochs - 1}, Train Loss: {epoch_loss:.4f}, Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}")
 
 def validate_model(model, val_loader):
     model.eval()
     running_loss = 0.0
     correct_preds = 0
-    
+
     criterion = nn.CrossEntropyLoss()
-    
+
     with torch.no_grad():
         for inputs, labels, _ in val_loader:
             outputs = model(inputs)
             loss = criterion(outputs, labels)
-            
+
             running_loss += loss.item() * inputs.size(0)
             _, preds = torch.max(outputs, 1)
             correct_preds += torch.sum(preds == labels.data)
-    
+
     epoch_loss = running_loss / len(val_loader.dataset)
     epoch_acc = correct_preds.double() / len(val_loader.dataset)
-    
+
     return epoch_loss, epoch_acc
 
 def plot_roc_curve(y_true, y_score, num_classes, save_path):
@@ -98,23 +98,23 @@ def plot_roc_curve(y_true, y_score, num_classes, save_path):
 def test_model(model, test_loader, num_classes, save_path, decoding, class_map):
     model.eval()
     correct_preds = 0
-    
+
     all_labels = []
     all_preds = []
     all_probs = []
-    
+
     with torch.no_grad():
-        for inputs, labels in test_loader:
+        for inputs, labels, _ in test_loader:
             outputs = model(inputs)
             _, preds = torch.max(outputs, 1)
             probs = nn.Softmax(dim=1)(outputs)
-            
+
             correct_preds += torch.sum(preds == labels.data)
-            
+
             all_labels.extend(labels.cpu().numpy())
             all_preds.extend(preds.cpu().numpy())
             all_probs.extend(probs.cpu().numpy())
-    
+
     test_acc = correct_preds.double() / len(test_loader.dataset)
     print(f"Test Accuracy: {test_acc:.4f}")
 
@@ -124,7 +124,7 @@ def test_model(model, test_loader, num_classes, save_path, decoding, class_map):
 
     y_true_labels = [decoding[num] for num in all_labels]
     y_pred_labels = [decoding[num] for num in all_preds]
-    
+
     # Generate classification report
     print("Classification Report:")
     print("Model classification report: \n",classification_report(y_true_labels, y_pred_labels,target_names=list(class_map.keys())))
