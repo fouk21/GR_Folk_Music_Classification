@@ -34,7 +34,6 @@ CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 ##############################################################
 
 def main():
-
     parser = argparse.ArgumentParser(description="Arguments for RNN Model")
 
     parser.add_argument('wav_folder', type=str, help='Folder with raw audio files')

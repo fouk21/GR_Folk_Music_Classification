@@ -20,19 +20,18 @@ from torchvision import datasets, transforms
 
 # Define PY script folder
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
-IMAGE_PATH = f'{CURRENT_DIR}/../dataset/spectrograms/train'
-# IMAGE_PATH = f'{CURRENT_DIR}/../dataset/mel-spectrograms/train'
+# IMAGE_PATH = f'{CURRENT_DIR}/../dataset/spectrograms/train'
+IMAGE_PATH = f'{CURRENT_DIR}/../dataset/mel-spectrograms/train'
 
 
 def plot_fig(ids, title, nrows=5, ncols=15):
     fig, ax = plt.subplots(nrows, ncols, figsize=(18, 6))
     plt.subplots_adjust(wspace=0.5, hspace=1)
 
+    plot_img_path = f'{CURRENT_DIR}/../data/spectrograms'
     for i, j in enumerate(ids[:nrows*ncols]):
-        fname = os.path.join(IMAGE_PATH, title, f'{j}.png')
+        fname = os.path.join(plot_img_path, title, f'{j}.png')
         img = Image.open(fname)
-        idcol = ImageDraw.Draw(img)
-        idcol.rectangle(((0, 0), (95, 95)), outline='white')
         plt.subplot(nrows, ncols, i + 1)
         plt.imshow(np.array(img))
         plt.axis('off')
@@ -47,7 +46,7 @@ def spec_sample_plotting(df):
 
     for region in regions:
         ids = df[df['region'] == region]['id'].to_list()
-        plot_fig(ids, region, nrows=2, ncols=3)
+        plot_fig(ids, region, nrows=1, ncols=4)
 
 
 def class_dist(df):
@@ -119,7 +118,7 @@ def cnn_train():
     BATCH_SIZE = 64
     NUM_CLASSES = 19
     LEARNING_RATE = 0.001
-    EPOCHS = 15
+    EPOCHS = 20
     TRAIN_SPLIT = 0.8
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -160,8 +159,8 @@ def cnn_train():
         shuffle=False,
     )
 
-    # model = AlexNet(NUM_CLASSES).to(device)
-    # model.apply(initialize_weights)
+    model = AlexNet(NUM_CLASSES).to(device)
+    model.apply(initialize_weights)
     model = SimpleCNN(NUM_CLASSES).to(device)
     summary(model, (3, 1000, 600))
 
@@ -330,14 +329,14 @@ def cnn_train():
 
     # Save the trained model
     # torch.save(model.state_dict(), 'cnn_alex_spec.pth')
-    torch.save(model.state_dict(), 'cnn_simple_spec.pth')
+    # torch.save(model.state_dict(), 'cnn_simple_spec.pth')
     # torch.save(model.state_dict(), 'cnn_alex_mel_spec.pth')
-    # torch.save(model.state_dict(), 'cnn_simple_mel_spec.pth')
+    torch.save(model.state_dict(), 'cnn_simple_mel_spec.pth')
 
 
 def main():
-    # data_exploration()
-    cnn_train()
+    data_exploration()
+    # cnn_train()
 
 
 if __name__ == '__main__':

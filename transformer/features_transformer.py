@@ -72,14 +72,14 @@ def main():
 
     # Parameters for the transformer
     feature_dim = 28  # Dimension of features per frame
-    nhead = 4  # Number of attention heads
-    num_encoder_layers = 3  # Number of transformer encoder layers
+    nhead = 7  # Number of attention heads
+    num_encoder_layers = 4  # Number of transformer encoder layers
     dim_feedforward = 256  # Dimension of feedforward network
     dropout = 0.1  # Dropout rate
 
     model = TransformerModel(feature_dim, num_classes, nhead, num_encoder_layers, dim_feedforward, dropout)
 
-    learning_rate = 1e-3
+    learning_rate = 1e-4
 
     train_model(model, train_loader, val_loader, epochs, learning_rate)
 

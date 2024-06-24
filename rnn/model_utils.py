@@ -57,20 +57,32 @@ class ModelUtils():
         self._model = new_model
 
     def train_epoch(self, epoch_num, grad_clip=True):
-
         self._model.train()
         epoch_loss = 0
         epoch_acc = 0
+        total_batches = 0  # Initialize a counter for total batches processed
+
         with tqdm(self._train_dataloader, unit="batch") as tepoch:  # Wrap the dataloader with tqdm
             tepoch.set_description(f"Epoch {epoch_num}/{self._epochs}")
+
             for batch_data, batch_labels, seq_lengths in tepoch:
+                # Move batch_data and batch_labels to device
                 batch_data, batch_labels = batch_data.to(self._device), batch_labels.to(self._device)
-                seq_lengths = seq_lengths.cpu()
+
+                # Filter out sequences with zero length
+                non_zero_idx = (seq_lengths != 0)
+                batch_data = batch_data[non_zero_idx]
+                batch_labels = batch_labels[non_zero_idx]
+                seq_lengths = seq_lengths[non_zero_idx]
+
+                if len(batch_data) == 0:
+                    continue  # If all sequences in this batch have length zero, skip this batch
+
                 self._optimizer.zero_grad()
-                outputs = self._model(batch_data,seq_lengths)
-                #print(seq_lengths)
-                pred_classes = torch.argmax(F.softmax(outputs, dim=1),dim=1)#torch.round(torch.sigmoid(predictions))
-                # print(batch_labels.shape)
+                outputs = self._model(batch_data, seq_lengths)
+
+                # Compute accuracy and loss only for non-zero length sequences in the batch
+                pred_classes = torch.argmax(F.softmax(outputs, dim=1), dim=1)
                 correct_outputs = (pred_classes == batch_labels).float()
                 acc = correct_outputs.sum() / len(correct_outputs)
 
@@ -86,18 +98,23 @@ class ModelUtils():
                         grad_val = torch.clamp(param.grad, -5, 5)
 
                 self._optimizer.step()
-
                 self._scheduler.step()
 
                 epoch_loss += loss.item()
                 epoch_acc += acc.item()
+                total_batches += 1  # Increment the batch counter
                 tepoch.set_postfix(loss=loss.item())
-        return epoch_loss/len(self._train_dataloader), epoch_acc/len(self._train_dataloader)
+
+        # Calculate average loss and accuracy per batch processed during training
+        if total_batches > 0:
+            return epoch_loss / total_batches, epoch_acc / total_batches
+        else:
+            return 0.0, 0.0  # Handle the case where no batches were processed (shouldn't happen ideally)
 
     def evaluate_epoch(self):
-
         total_loss = 0
         total_acc = 0
+        total_batches = 0  # Initialize a counter for total batches processed
 
         self._model.eval()
 
@@ -108,18 +125,33 @@ class ModelUtils():
                 data, labels, seq_lengths = batch[0], batch[1], batch[2]
                 data, labels = data.to(self._device), labels.to(self._device)
                 seq_lengths = seq_lengths.cpu()
-                predictions = self._model(data,seq_lengths)
-                loss = self._criterion(predictions,labels)
 
-                pred_classes = torch.argmax(F.softmax(predictions, dim=1),dim=1)
+                # Filter out sequences with zero length
+                non_zero_idx = (seq_lengths != 0)
+                data = data[non_zero_idx]
+                labels = labels[non_zero_idx]
+                seq_lengths = seq_lengths[non_zero_idx]
+
+                if len(data) == 0:
+                    continue  # If all sequences in this batch have length zero, skip this batch
+
+                predictions = self._model(data, seq_lengths)
+                loss = self._criterion(predictions, labels)
+
+                pred_classes = torch.argmax(F.softmax(predictions, dim=1), dim=1)
                 correct_preds = (pred_classes == labels).float()
 
-                accuracy = correct_preds.sum()/len(correct_preds)
+                accuracy = correct_preds.sum() / len(correct_preds)
 
                 total_loss += loss.item()
                 total_acc += accuracy.item()
+                total_batches += 1  # Increment the batch counter
 
-        return total_loss/len(self._validation_dataloader), total_acc/len(self._validation_dataloader)
+        # Calculate average loss and accuracy per batch processed during evaluation
+        if total_batches > 0:
+            return total_loss / total_batches, total_acc / total_batches
+        else:
+            return 0.0, 0.0  # Handle the case where no batches were processed (shouldn't happen ideally)
 
     def print_model_metrics(self, y_test, y_pred_list, save_path):
         print("--------------------------------------------")
