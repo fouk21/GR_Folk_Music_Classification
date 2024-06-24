@@ -11,11 +11,11 @@ import argparse
 
 # SEED = 13 # reproducible results: Same results in every run
 # IN_PATH = ''
-# DATA_PATH = '' 
+# DATA_PATH = ''
 # OUT_PATH = ''
 # EPOCH = 20 # number of epochs to run for model
 
-# np.random.seed(SEED) 
+# np.random.seed(SEED)
 # torch.manual_seed(SEED)
 # torch.cuda.manual_seed(SEED)
 # torch.backends.cudnn.deterministic = True  # cuda algorithms
@@ -27,7 +27,6 @@ import argparse
 ##############################################################
 
 def main():
-
     parser = argparse.ArgumentParser(description="Arguments for Transformer Model")
 
     parser.add_argument('dataset_location', type=str, help='CSV Dataset location')
@@ -39,7 +38,7 @@ def main():
 
     data, labels, num_classes, class_map = DataUtils.preprocess_feature_data(args.dataset_location)
     decoding = {idx: label for label, idx in class_map.items()}
-    
+
     epochs = args.epochs
     batch_size = args.batch_size
 
@@ -65,7 +64,7 @@ def main():
 
     input_shape = data.shape[2]
 
-    device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     results_dir = args.results_dir
     if not os.path.exists(results_dir):
@@ -85,6 +84,7 @@ def main():
     train_model(model, train_loader, val_loader, epochs, learning_rate)
 
     test_model(model, test_loader, num_classes, results_dir, decoding, class_map)
+
 
 if __name__ == "__main__":
     main()

@@ -1,16 +1,17 @@
-from model_utils import ModelTuning
-import pickle
 import argparse
+import pickle
+
+from model_utils import ModelTuning
+
 
 def main():
-
     parser = argparse.ArgumentParser(description="Arguments for Model Hyperparameter Tuning")
 
     parser.add_argument('pickle_path', type=str, help='Folder with pickled model object')
     parser.add_argument('save_path', type=str, help='Folder to save pickled best_params dict')
 
     args = parser.parse_args()
-    
+
     print("INFO: Started Model Hyperparameter Tuning")
 
     with open(args.pickle_path, 'rb') as file:
@@ -18,10 +19,9 @@ def main():
 
     tuning_experiment = ModelTuning(model_class)
 
-    tuning_experiment.finetune_model(2,args.save_path)
+    tuning_experiment.finetune_model(100, args.save_path)
 
-    tuning_experiment.plot_tuning()
-
+    tuning_experiment.plot_tuning(args.save_path)
 
 
 if __name__ == "__main__":

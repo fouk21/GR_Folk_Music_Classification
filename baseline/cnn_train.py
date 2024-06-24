@@ -21,7 +21,7 @@ from torchvision import datasets, transforms
 # Define PY script folder
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 IMAGE_PATH = f'{CURRENT_DIR}/../dataset/spectrograms/train'
-IMAGE_PATH = f'{CURRENT_DIR}/../dataset/mel-spectrograms/train'
+# IMAGE_PATH = f'{CURRENT_DIR}/../dataset/mel-spectrograms/train'
 
 
 def plot_fig(ids, title, nrows=5, ncols=15):
@@ -117,7 +117,7 @@ def cnn_train():
 
     # Define relevant variables for the DL task
     BATCH_SIZE = 64
-    NUM_CLASSES = 21
+    NUM_CLASSES = 19
     LEARNING_RATE = 0.001
     EPOCHS = 15
     TRAIN_SPLIT = 0.8
@@ -160,9 +160,9 @@ def cnn_train():
         shuffle=False,
     )
 
-    model = AlexNet(NUM_CLASSES).to(device)
-    model.apply(initialize_weights)
-    # model = SimpleCNN(NUM_CLASSES).to(device)
+    # model = AlexNet(NUM_CLASSES).to(device)
+    # model.apply(initialize_weights)
+    model = SimpleCNN(NUM_CLASSES).to(device)
     summary(model, (3, 1000, 600))
 
     # # Create a dummy input tensor with the appropriate dimensions

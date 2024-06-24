@@ -10,6 +10,9 @@ from model_utils import ModelUtils
 import pandas as pd
 import argparse
 
+# Define PY script folder
+CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
+
 ##############################################################
 ##############################################################
 
@@ -58,7 +61,7 @@ def main():
     wav_folder = args.wav_folder  #'../data/cropped'
     frame_length = args.frame_length    #44100  # Example: 1 second at 44.1 kHz sampling rate
     max_lentgh = args.max_length #9500000
-    data_df = pd.read_csv(args.dataset_location)  # 'dummy_dataset.csv'
+    data_df = pd.read_csv(f'{CURRENT_DIR}/../data/scripts/{args.dataset_location}')
 
     num_classes = data_df['region'].nunique()  # Example: 3 classes for classification
 
@@ -105,7 +108,7 @@ def main():
     # RNN model instantiation
     model_experiment = ModelUtils(train_loader,val_loader,test_loader,input_shape,num_classes,class_mapping)
 
-    device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     results_dir = args.results_dir
     if not os.path.exists(results_dir):

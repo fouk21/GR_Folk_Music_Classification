@@ -1,14 +1,15 @@
+import argparse
+import pandas as pd
 import pickle
-from sklearn.model_selection import train_test_split
 import torch.nn as nn
 import torch.optim as optim
+
+from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
 from sound_utils import *
 from data_utils import *
 from model import *
 from model_utils import ModelUtils
-import pandas as pd
-import argparse
 
 ##############################################################
 ##############################################################
@@ -94,7 +95,7 @@ def main():
     # RNN model instantiation
     model_experiment = ModelUtils(train_loader,val_loader,test_loader,input_shape,num_classes,class_mapping)
 
-    device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     results_dir = args.results_dir
     if not os.path.exists(results_dir):

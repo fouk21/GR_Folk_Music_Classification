@@ -13,13 +13,13 @@ from optuna.visualization import plot_parallel_coordinate
 from optuna.visualization import plot_param_importances
 from sklearn.preprocessing import label_binarize
 import pickle
+import plotly.io as pio
 
 class ModelUtils():
 
     def __init__(self, train_loader, val_loader, test_loader, input_shape, num_classes, class_map) -> None:
         # Check for CUDA
-        #TODO: CHANGE MPS
-        self._device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+        self._device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self._model = None
         self._train_dataloader = train_loader
         self._test_dataloader = test_loader
@@ -35,19 +35,19 @@ class ModelUtils():
     @property
     def model(self):
         return self._model
-    
+
     @property
     def criterion(self):
         return self._criterion
-    
+
     @property
     def optimizer(self):
         return self._optimizer
-    
+
     @criterion.setter
     def criterion(self, new_criterion):
         self._criterion = new_criterion
-    
+
     @optimizer.setter
     def optimizer(self, new_optimizer):
         self._optimizer = new_optimizer
@@ -57,7 +57,7 @@ class ModelUtils():
         self._model = new_model
 
     def train_epoch(self, epoch_num, grad_clip=True):
-        
+
         self._model.train()
         epoch_loss = 0
         epoch_acc = 0
@@ -77,25 +77,25 @@ class ModelUtils():
                 loss = self._criterion(outputs, batch_labels)
 
                 loss.backward()
-                
+
                 if grad_clip:
                     for param in self._model.parameters():
                         if param.grad is None:
                             print("INFO: Grad Clip!")
                             continue
                         grad_val = torch.clamp(param.grad, -5, 5)
-                
+
                 self._optimizer.step()
 
                 self._scheduler.step()
-                
+
                 epoch_loss += loss.item()
                 epoch_acc += acc.item()
                 tepoch.set_postfix(loss=loss.item())
         return epoch_loss/len(self._train_dataloader), epoch_acc/len(self._train_dataloader)
-    
+
     def evaluate_epoch(self):
-        
+
         total_loss = 0
         total_acc = 0
 
@@ -116,11 +116,11 @@ class ModelUtils():
 
                 accuracy = correct_preds.sum()/len(correct_preds)
 
-                total_loss += loss.item() 
+                total_loss += loss.item()
                 total_acc += accuracy.item()
 
         return total_loss/len(self._validation_dataloader), total_acc/len(self._validation_dataloader)
-    
+
     def print_model_metrics(self, y_test, y_pred_list, save_path):
         print("--------------------------------------------")
         print("Model confusion matrix: \n",confusion_matrix(y_test, y_pred_list))
@@ -138,7 +138,7 @@ class ModelUtils():
             print("--------------------------------------------",file=file)
             y_true_labels = [self.decoding[num] for num in y_test]
             y_pred_labels = [self.decoding[num] for num in y_pred_list]
-            print("Model classification report: \n",classification_report(y_true_labels, y_pred_labels,target_names=list(self.class_map.keys())),file=file)            
+            print("Model classification report: \n",classification_report(y_true_labels, y_pred_labels,target_names=list(self.class_map.keys())),file=file)
             print("--------------------------------------------",file=file)
             print("Model accuracy: ",accuracy_score(y_test, y_pred_list),file=file)
             print("--------------------------------------------",file=file)
@@ -153,7 +153,7 @@ class ModelUtils():
         fpr = dict()
         tpr = dict()
         roc_auc = dict()
-        
+
         # Compute ROC curve and ROC area for each class
         for i in range(self._numClasses):
             fpr[i], tpr[i], _ = roc_curve(y_test_bin[:, i], y_pred_prob_list[:, i])
@@ -175,18 +175,18 @@ class ModelUtils():
         plt.title('Receiver Operating Characteristic for Multiclass')
         plt.legend(loc="lower right")
         plt.savefig(save_path+'roc_curve.png')
-        plt.show()        
+        plt.show()
 
 #TODO: ADD CLASS MAPPING
     def test_model(self, path):
-    
+
         y_test = []
         y_pred_list = []
         y_pred_prob_list = []
         self._model.eval()
-        
+
         with torch.no_grad():
-            
+
             for batch in self._test_dataloader:
 
                 data, labels, seq_lengths = batch[0], batch[1], batch[2]
@@ -198,10 +198,10 @@ class ModelUtils():
 
                 y_pred_list += pred_classes.tolist()
                 y_pred_prob_list += predictions.tolist()
-                
+
                 y_test += labels.tolist()
-        
-            
+
+
         self.print_model_metrics(y_test, y_pred_list, path)
 
         self.plot_roc_curve(y_test, y_pred_prob_list, path)
@@ -211,11 +211,11 @@ class ModelUtils():
         print("INFO: Started Model Training")
 
         early_stopping = EarlyStopping(tolerance=2, min_delta=18)
-        rnn_kwargs = {'num_layers':params['num_layers'], 
-                      'batch_first':True, 
+        rnn_kwargs = {'num_layers':params['num_layers'],
+                      'batch_first':True,
                       'dropout':params['dropout_probability']
                       }
-        input_shape = self._input_shape     
+        input_shape = self._input_shape
         drop = params['dropout_probability'] # how much to drop
         hidden_size = params['hidden_size']
         cell_type = params['cell_type']
@@ -224,8 +224,8 @@ class ModelUtils():
         gradient_clipping = params['gradient_clipping']
         bidirectional = params['bidirectional']
 
-        self._model = RNNModel(input_shape, self._numClasses, drop, 
-                               skip_connections, hidden_layers, hidden_size, 
+        self._model = RNNModel(input_shape, self._numClasses, drop,
+                               skip_connections, hidden_layers, hidden_size,
                                cell_type, bidirectional, **rnn_kwargs).to(self._device)
 
         self._criterion = torch.nn.CrossEntropyLoss()    #has softmax integrated
@@ -249,11 +249,11 @@ class ModelUtils():
             if early_stopping.early_stop:
                 print(f"\nINFO: Ending early. Converged in {epoch} epochs.")
                 break
-                
+
         if plot:
-            print("Learning Curves of model:")        
-            plt.plot(train_accs,'-o')
-            plt.plot(val_accs,'-o')
+            print("Learning Curves of model:")
+            plt.plot(train_accs, '-o')
+            plt.plot(val_accs, '-o')
             plt.xlabel('epoch')
             plt.ylabel('accuracy')
             plt.legend(['Train', 'Validation'])
@@ -262,8 +262,8 @@ class ModelUtils():
                 plt.savefig(save_path+'accuracy_curve.png')
             plt.show()
 
-            plt.plot(train_losses,'-o')
-            plt.plot(val_losses,'-o')
+            plt.plot(train_losses, '-o')
+            plt.plot(val_losses, '-o')
             plt.xlabel('epoch')
             plt.ylabel('losses')
             plt.legend(['Train', 'Validation'])
@@ -271,12 +271,12 @@ class ModelUtils():
             if save_path:
                 plt.savefig(save_path+'loss_curve.png')
             plt.show()
-        
+
         #torch.save(self._model, 'model.pt')
         return val_acc
 
     def train_cnn(self, epochs):
-        
+
         print("INFO: Model Training Started")
         self._model = CNNModel(self._numClasses)
         self._model.to(self._device)
@@ -291,7 +291,6 @@ class ModelUtils():
                 data, target = data.to(self._device), target.to(self._device)
                 optimizer.zero_grad()
                 output = self._model(data)
-                #TODO: CHECK ACTIVATION FUNCTION
                 loss = criterion(output, target)
                 loss.backward()
                 optimizer.step()
@@ -308,7 +307,7 @@ class ModelUtils():
                     data, target = data.to(self._device), target.to(self._device)
                     output = self._model(data)
                     val_loss += criterion(output, target).item()
-                    #pred = output.argmax(dim=1, keepdim=True)
+                    # pred = output.argmax(dim=1, keepdim=True)
                     pred = torch.argmax(F.log_softmax(output, dim=-1),dim=1)
                     correct += pred.eq(target.view_as(pred)).sum().item()
             avg_val_loss = val_loss / len(self._validation_dataloader)
@@ -316,28 +315,27 @@ class ModelUtils():
             print(f'====> Validation set: Average loss: {avg_val_loss:.4f}, Accuracy: {correct}/{len(self._validation_dataloader)} ({100. * val_accuracy:.2f}%)')
 
     def test_cnn(self, path):
-    
+
         y_test = []
         y_pred_list = []
         y_pred_prob_list = []
         self._model.eval()
-        
+
         with torch.no_grad():
-            
+
             for batch in self._test_dataloader:
 
                 data, labels = batch[0], batch[1]
-                data, labels= data.to(self._device), labels.to(self._device)
+                data, labels = data.to(self._device), labels.to(self._device)
                 predictions = self._model(data)
                 predictions = predictions.cpu()
                 pred_classes = torch.argmax(F.log_softmax(predictions, dim=-1),dim=1)
 
                 y_pred_list += pred_classes.tolist()
                 y_pred_prob_list += predictions.tolist()
-                
+
                 y_test += labels.tolist()
-        
-            
+
         self.print_model_metrics(y_test, y_pred_list, path)
 
         self.plot_roc_curve(y_test, y_pred_prob_list, path)
@@ -347,7 +345,7 @@ class ModelUtils():
         print("INFO: Loaded model: ", model_path)
 
     def save_model(self, model_path):
-        torch.save(self._model,model_path)
+        torch.save(self._model, model_path)
         print("INFO: Model Saved at: ", model_path)
         pass
 
@@ -356,8 +354,9 @@ class ModelUtils():
         with open(save_path+model_name+'.txt', 'a') as file:
             print(self._model, file=file)
 
+
 class EarlyStopping:
-    
+
     def __init__(self, tolerance=5, min_delta=0):
 
         self.tolerance = tolerance
@@ -367,19 +366,20 @@ class EarlyStopping:
 
     def __call__(self, train_loss, validation_loss):
         if (validation_loss - train_loss) > self.min_delta:
-            self.counter +=1
-            if self.counter >= self.tolerance:  
+            self.counter += 1
+            if self.counter >= self.tolerance:
                 self.early_stop = True
+
 
 class ModelTuning:
 
     def __init__(self, model_experiment) -> None:
-        
+
         self.model_experiment = model_experiment
         self.study = optuna.create_study(direction='maximize', sampler=optuna.samplers.TPESampler(), study_name='RNN Model Fine Tuning')
 
-    def objective(self,trial):
-    
+    def objective(self, trial):
+
         params = {
                 'learning_rate': trial.suggest_categorical('learning_rate', [0.0001, 0.001]),
                 'num_layers': trial.suggest_categorical('num_layers', [1, 2]),
@@ -391,9 +391,9 @@ class ModelTuning:
                 'hidden_size': trial.suggest_categorical('hidden_size', [128, 64]),
                 'bidirectional': trial.suggest_categorical('bidirectional', [True, False]),
                 }
-        
-        return self.model_experiment.train_evaluate(params,False,None,1)
-    
+
+        return self.model_experiment.train_evaluate(params, False, None, 2)
+
     def finetune_model(self, n_trials, save_path):
         self.study.optimize(self.objective, n_trials=n_trials)
 
@@ -403,15 +403,31 @@ class ModelTuning:
         for key, value in self.best_trial.params.items():
             print("{} : {}".format(key, value))
 
-        with open(save_path, 'wb') as file:
-            pickle.dump(self.best_trial.params,file)
-    
-    def plot_tuning(self):
-        plot_optimization_history(self.study)
-        plot_parallel_coordinate(self.study)
-        plot_param_importances(self.study)
-        plot_contour(self.study, params=['num_layers', 'hidden_size'])
-        plot_contour(self.study, params=['cell_type', 'num_layers'])
+        with open(f'{save_path}/rnn_tuned.pkl', 'wb') as file:
+            pickle.dump(self.best_trial.params, file)
 
-
-#TODO: ADD EARLY STOPPING plot stopping
+    def plot_tuning(self, save_path):
+        pio.write_image(
+            plot_optimization_history(self.study),
+            f'{save_path}/opti_hist.png'
+        )
+        pio.write_image(
+            plot_parallel_coordinate(self.study),
+            f'{save_path}/paral_coord.png'
+        )
+        pio.write_image(
+            plot_param_importances(self.study),
+            f'{save_path}/param_imp.png'
+        )
+        pio.write_image(
+            plot_contour(self.study, params=['num_layers', 'hidden_size']),
+            f'{save_path}/layers_hiden.png'
+        )
+        pio.write_image(
+            plot_contour(self.study, params=['cell_type', 'num_layers']),
+            f'{save_path}/cell_layers.png'
+        )
+        pio.write_image(
+            plot_contour(self.study, params=['bidirectional', 'num_layers']),
+            f'{save_path}/bide_layers.png'
+        )

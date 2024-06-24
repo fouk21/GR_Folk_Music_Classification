@@ -10,6 +10,10 @@ import pandas as pd
 import argparse
 import pickle
 
+# Define PY script folder
+CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
+
+
 ##############################################################
 ##############################################################
 
@@ -47,7 +51,7 @@ def main():
     wav_folder = args.wav_folder
     frame_length = args.frame_length    
     max_lentgh = args.max_length
-    data_df = pd.read_csv(args.dataset_location)
+    data_df = pd.read_csv(f'{CURRENT_DIR}/../data/scripts/{args.dataset_location}')
     batch_size = args.batch_size
     results_dir = args.results_dir
     epochs = args.epochs
@@ -83,7 +87,7 @@ def main():
 
     model_experiment = ModelUtils(train_loader,val_loader,test_loader,input_shape,num_classes,class_mapping)
 
-    device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     model_experiment.train_cnn(epochs)
 
